@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>CF Round 972 div2</title>
+    <url>/2024/10/21/cf_round972_div2/</url>
+    <content><![CDATA[<h1 id="c.-lazy-narek"><a
+href="https://codeforces.com/contest/2005/problem/C">C. Lazy
+Narek</a></h1>
+<p>dp即可； <strong>不过一定要好好读题才行！！</strong>
+就是读题读假了和不仔细，才导致vp赛时没有调出来。
+这个dp的优化(或者是自然而然的处理)：数组开1维5个位置即可，不需要对m轮全部开一个位置，否则会tle。状态转移时记得滚动，不要在原数组上面改，否则会出问题(可能跑出来同一层选了两次的结果)</p>
+<h1 id="d.-alter-the-gcd"><a
+href="https://codeforces.com/contest/2005/problem/D">D. Alter the
+GCD</a></h1>
+<h3 id="analysis">analysis</h3>
+<p>前缀和后缀和gcd自然不用多说。逐一枚举<span
+class="math inline">\(\{l，r\}\)</span>即使每次枚举求值是<span
+class="math inline">\(O(1)\)</span>也会tle。所以要寻求更好的方法求解。</p>
+<p>由于一个数的质因子最多只有<span class="math inline">\(\log
+n\)</span>个，考虑gcd prefix是单调非升的，那么有如下性质： 只有最多<span
+class="math inline">\(\log n\)</span>个位置 <span
+class="math inline">\(i\)</span> 使 $ prefix[i] &gt; prefix[i+1] $
+,其余均为 <span class="math inline">\(prefix[i] = prefix[i+1]\)</span>
+对suffix gcd类似。 那么实际上，绝大多数前后缀gcd是相等的。 如果枚举<span
+class="math inline">\(\{l，r\}\)</span>是对于<span
+class="math inline">\(l\)</span>或<span
+class="math inline">\(r\)</span>都是<span
+class="math inline">\(O(n)\)</span>，组合起来是<span
+class="math inline">\(O(n^2)\)</span>的的话，我们枚举单个变量的前缀/后缀值可以把这个枚举降到一个<span
+class="math inline">\(O(\log n)\)</span>的时间复杂度
+基于这样的观察，我们有不同的思路求解：</p>
+<h3 id="solve1-分治">solve1 分治</h3>
+<p>我们枚举l，r代表的前后缀值的话，那么中间这部分怎么加进来呢?如何防止l&gt;r呢
+(毕竟不同的值都转化成了gcd value) 我们考虑设定一个枚举范围 $ [l,r],mid =
+(l+r)/2 $ ,枚举所有的<span class="math inline">\(l \le i \le
+mid\)</span>和<span class="math inline">\((mid +1) \le j \le r\)</span>
+这个时候所有跨 <span class="math inline">\(mid\)</span> 和 <span
+class="math inline">\(mid+1\)</span>
+间隙的值都被遍历到了，只剩两个子区间内部的没有被枚举。
+于是我们递归地取求解 <span class="math inline">\([l,mid]\)</span> 和
+<span class="math inline">\([mid+1,r]\)</span> ，而对于 <span
+class="math inline">\(l = r\)</span> 的区间我们特别枚举答案 <span
+class="math inline">\(\{l,r\}\)</span> (因为按照前面的规则的话 <span
+class="math inline">\([l,r]\)</span>
+是没有贡献对的，这样会漏，但是如果我们扩大 <span
+class="math inline">\([l,r]\)</span>
+的贡献对范围的话，导致重复贡献将难以处理。)
+通过这样的递归，或者说是分治策略，我们按值枚举不重不漏地遍历了所有组合</p>
+<p>那么如何通过<strong>按值枚举</strong>快速求出一个枚举范围 <span
+class="math inline">\([l,r]\)</span> 所有的 <span
+class="math inline">\(value(\{i,j\})\)</span> 呢
+根据前面的分治策略，我们把三段gcd的复合转化成以mid为界的两段gcd的复合：(以数组a最终的gcd为例)
+<span class="math display">\[p[i] =
+\gcd(a_l,a_{l+1},...,a_{i-1},b_i,b_{i+1},...,b_{mid})\]</span> <span
+class="math display">\[s[j] =
+\gcd(b_{mid+1},b_{mid+2},...b_{j},a_{j+1},...,a_{r})\]</span> 由于对
+<span class="math inline">\(a,b\)</span> 均要求出 <span
+class="math inline">\(p[i] , s[j]\)</span> ,
+我们用map&lt;pair&lt;int,int&gt;&gt;<span
+class="math inline">\(pmp,smp\)</span>( <span
+class="math inline">\(a,b\)</span> 相同位置的 <span
+class="math inline">\(p[i],s[j]\)</span>
+成一组存储，作为相异的键，值则为其数量)存储这样的 <span
+class="math inline">\(p[i]\)</span> 的值和 <span
+class="math inline">\(s[j]\)</span> 的值。
+再利用一点点前缀和后缀和，我们便可以用<span
+class="math inline">\(O(n)\)</span>的时间<strong>分别</strong>遍历<span
+class="math inline">\(i,j\)</span>的所有取值 随后我们用两层循环遍历<span
+class="math inline">\(pmp,smp\)</span>，将所有值的组合纳入答案
+由前面的观察，这个部分的时间复杂度是<span
+class="math inline">\(O(\log^2n)\)</span>
+那么，我们处理每个区间的时间复杂度为： <span
+class="math inline">\(O(n+\log^2n) = O(n)\)</span>
+这是一个分治算法，那么整体复杂度为 <span class="math inline">\(O(n\log
+n)\)</span>，足以通过本题。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Week6 Training</title>
+    <url>/2024/10/22/week6/</url>
+    <content><![CDATA[<h1 id="g.-milky-days"><a
+href="https://codeforces.com/problemset/problem/2014/G">2014 G. Milky
+Days</a></h1>
+<p>实际上是一道模拟题，
+我们定义关键天为牛奶数目可能会非因为喝掉而改变的那天。
+利用一个deque去处理关键天时能否供给牛奶即可 则关键天为 <span
+class="math inline">\(\min(最近牛奶过期天，下一个获得牛奶的天)\)</span>
+我们一边求解答案一边算下一个关键天是哪个 假设关键天序列为<span
+class="math inline">\(a_0,a_1,a_2,a_3...\)</span> 初始化<span
+class="math inline">\(a_0 = 1\)</span>
+由于一个关键天到下一个关键天前,牛奶只会被喝掉而不会过期、增加，那么我们就可以<span
+class="math inline">\(O(1)\)</span>处理掉这一段了。 于是我们的算法是：
+1. 算出下一个关键天<span class="math inline">\(a_{i+1}\)</span> 2.
+处理区间<span class="math inline">\([a_i,a_{i+1}-1]\)</span> 3.
+把关键天对milk数目的影响加入进去</p>
+<p>显然，我们如上初始化之后，只需要一个简单的技巧：补一个足够大的关键天并让它对牛奶的影响为0，最后即可得到答案。</p>
+<p>我们对每一段的处理是<span
+class="math inline">\(O(1)\)</span>的，而总的关键天数不会超过<span
+class="math inline">\(2n\)</span>(每一批的牛奶都过期了)，那么总的时间复杂度为<span
+class="math inline">\(O(n)\)</span></p>
+<details>
+<summary>
+Code:
+</summary>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> n, m, k;</span><br><span class="line">    cin &gt;&gt; n &gt;&gt; m &gt;&gt; k;</span><br><span class="line">    deque&lt;pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt;&gt;dq;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(n);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">d</span>(n);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; d[i] &gt;&gt; a[i];</span><br><span class="line">    &#125;</span><br><span class="line">    a.<span class="built_in">push_back</span>(<span class="number">0</span>);</span><br><span class="line">    d.<span class="built_in">push_back</span>(<span class="number">1145141919</span>);</span><br><span class="line">    <span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> t = <span class="number">1</span>;</span><br><span class="line">    ll mks = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> p = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (p != n + <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> nxt;</span><br><span class="line">        <span class="keyword">if</span> (dq.<span class="built_in">empty</span>())</span><br><span class="line">            nxt = d[p];</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            nxt = <span class="built_in">min</span>(dq.<span class="built_in">front</span>().second + k, d[p]);</span><br><span class="line"></span><br><span class="line">        ll need = (nxt - t) * (ll)m;</span><br><span class="line">        <span class="keyword">if</span> (mks &gt;= need) &#123;</span><br><span class="line">            mks -= need;</span><br><span class="line">            ans += nxt - t;</span><br><span class="line">            <span class="keyword">while</span> (need &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (need &gt;= dq.<span class="built_in">back</span>().first) &#123;</span><br><span class="line">                    need -= dq.<span class="built_in">back</span>().first;</span><br><span class="line">                    dq.<span class="built_in">pop_back</span>();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    dq.<span class="built_in">back</span>().first -= need;</span><br><span class="line">                    need = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            ans += mks / m;</span><br><span class="line">            mks = <span class="number">0</span>;</span><br><span class="line">            dq.<span class="built_in">clear</span>();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (nxt == d[p]) &#123;</span><br><span class="line">            dq.<span class="built_in">push_back</span>(&#123; a[p],d[p] &#125;);</span><br><span class="line">            mks += a[p];</span><br><span class="line">            p++;</span><br><span class="line">            t = nxt;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (!dq.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">                mks -= dq.<span class="built_in">front</span>().first;</span><br><span class="line">                dq.<span class="built_in">pop_front</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            t = nxt;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</details>
+<h1 id="h.-robin-hood-archery"><a
+href="https://codeforces.com/problemset/problem/2014/H">2014 H. Robin
+Hood Archery</a></h1>
+<p>通过简单的观察，只有这个区间的所有数都出现偶数次才可能平手，所以我们自然联想到用异或hash来处理：
+由异或的性质，每个数的偶数次异或和结果为0。
+于是一个区间的数都出现偶数次的必要条件于这个区间的随机异或和为0(充要前提是不发生hash碰撞)。
+于是我们给每个数随机一个mt19937_64作为值，然后处理一下异或前缀和方便<span
+class="math inline">\(O(1)\)</span>查询每个区间
+<strong>(每个数异或逆元是它本身，即很好找到异或逆元，这是我们从前缀和得到区间和的必要条件，而像<span
+class="math inline">\(\gcd\)</span>等运算根本没有逆元导致没办法处理前缀和之后就<span
+class="math inline">\(O(1)\)</span>求解区间和)</strong>
+之后就很简单了，如果异或和为0即为合法区间。</p>
+<details>
+<summary>
+Code:
+</summary>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">mt19937_64 <span class="title">rnd</span><span class="params">(chrono::steady_clock::now().time_since_epoch().count())</span></span>;</span><br><span class="line">    map&lt;<span class="type">int</span>, ll&gt;mp, status;</span><br><span class="line">    <span class="type">int</span> n, q;</span><br><span class="line">    cin &gt;&gt; n &gt;&gt; q;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(n + <span class="number">1</span>);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">hs</span>(n + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; a[i];</span><br><span class="line">        <span class="keyword">if</span> (mp[a[i]] == <span class="number">0</span>) &#123;</span><br><span class="line">            mp[a[i]] = <span class="built_in">rnd</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        hs[i] = mp[a[i]];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        hs[i] ^= hs[i - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; q; i++) &#123;</span><br><span class="line">        <span class="type">int</span> l, r;</span><br><span class="line">        cin &gt;&gt; l &gt;&gt; r;</span><br><span class="line">        <span class="keyword">if</span> ((hs[r] ^ hs[l - <span class="number">1</span>]) == <span class="number">0</span>) &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;Yes&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;No&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">       </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</details>
+<p>这题好像也有莫队的做法，想想也可行(如果实现比较好不被卡常)</p>
+<h1 id="e.-compatible-numbers"><a
+href="https://codeforces.com/problemset/problem/165/E">165 E. Compatible
+Numbers</a></h1>
+<p>从某道最近的题来的S 一道sos dp典题，但是写的时候过于犯病</p>
+<p>题意大概是给定一个非空多重集合，<span class="math inline">\(a_i \ge
+1\)</span>。定义compatible(相容)<span
+class="math inline">\(a\)</span>相容<span
+class="math inline">\(b\)</span>为 <span class="math inline">\(a \&amp;
+b =
+0\)</span>,对集合中每个元素，求集合中与它相容的元素(不能是它本身或者相等的元素)</p>
+<p>因为知道是sosdp，所以很快有思路： 每个元素<span
+class="math inline">\(a_i\)</span>按位取反<span
+class="math inline">\(\sim a_i\)</span>的子掩码都与<span
+class="math inline">\(a_i\)</span>相容，我们直接用<span
+class="math inline">\(a_i\)</span>的下标<span
+class="math inline">\(i\)</span>初始化<span
+class="math inline">\(dp[\sim
+a_i]\)</span>，其他初始值为0,然后跑一遍sosdp即可。设置a[0] =
+-1即可让<span class="math inline">\(ans[i] = a[dp[a[i]]]\)</span>;</p>
+<p>sosdp的dp方法： 对每个位来一轮(假设为第<span
+class="math inline">\(i\)</span>位)，遍历整个状态空间，如果该位置<span
+class="math inline">\(p\)</span>这一位为1(<span
+class="math inline">\((p&gt;&gt;i) \&amp; 1 == 1\)</span>)，则更新 <span
+class="math display">\[dp[p \oplus 1&lt;&lt;i] = \max(dp[p],dp[p \oplus
+1&lt;&lt;i])\]</span> 取max是为了防止被-1覆盖。</p>
+<details>
+<summary>
+Code:
+</summary>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> m = <span class="number">22</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> p = <span class="number">1</span> &lt;&lt; m;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> inf = (<span class="number">1</span> &lt;&lt; m) - <span class="number">1</span>;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(n + <span class="number">1</span>);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">msk</span>(p);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; a[i];</span><br><span class="line">        msk[(~a[i]) &amp; inf] = i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; p; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((j &gt;&gt; i) &amp; <span class="number">1</span>) &#123;</span><br><span class="line">                msk[j ^ (<span class="number">1</span> &lt;&lt; i)] = <span class="built_in">max</span>(msk[j], msk[j ^ (<span class="number">1</span> &lt;&lt; i)]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (msk[a[i]])</span><br><span class="line">            cout &lt;&lt; a[msk[a[i]]] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            cout &lt;&lt; <span class="number">-1</span> &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&lt;&gt;</p>
+]]></content>
+  </entry>
+</search>
