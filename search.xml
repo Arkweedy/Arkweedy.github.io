@@ -1,86 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>CF Round 972 div2</title>
-    <url>/2024/10/21/%E9%A2%98%E8%A7%A3/Codeforces/Contest/cf_round972_div2/</url>
-    <content><![CDATA[<h1 id="c.-lazy-narek"><a
-href="https://codeforces.com/contest/2005/problem/C">C. Lazy
-Narek</a></h1>
-<p>dp即可； <strong>不过一定要好好读题才行！！</strong>
-就是读题读假了和不仔细，才导致vp赛时没有调出来。
-这个dp的优化(或者是自然而然的处理)：数组开1维5个位置即可，不需要对m轮全部开一个位置，否则会tle。状态转移时记得滚动，不要在原数组上面改，否则会出问题(可能跑出来同一层选了两次的结果)</p>
-<h1 id="d.-alter-the-gcd"><a
-href="https://codeforces.com/contest/2005/problem/D">D. Alter the
-GCD</a></h1>
-<h3 id="analysis">analysis</h3>
-<p>前缀和后缀和gcd自然不用多说。逐一枚举<span
-class="math inline">\(\{l，r\}\)</span>即使每次枚举求值是<span
-class="math inline">\(O(1)\)</span>也会tle。所以要寻求更好的方法求解。</p>
-<p>由于一个数的质因子最多只有<span class="math inline">\(\log
-n\)</span>个，考虑gcd prefix是单调非升的，那么有如下性质： 只有最多<span
-class="math inline">\(\log n\)</span>个位置 <span
-class="math inline">\(i\)</span> 使 $ prefix[i] &gt; prefix[i+1] $
-,其余均为 <span class="math inline">\(prefix[i] = prefix[i+1]\)</span>
-对suffix gcd类似。 那么实际上，绝大多数前后缀gcd是相等的。 如果枚举<span
-class="math inline">\(\{l，r\}\)</span>是对于<span
-class="math inline">\(l\)</span>或<span
-class="math inline">\(r\)</span>都是<span
-class="math inline">\(O(n)\)</span>，组合起来是<span
-class="math inline">\(O(n^2)\)</span>的的话，我们枚举单个变量的前缀/后缀值可以把这个枚举降到一个<span
-class="math inline">\(O(\log n)\)</span>的时间复杂度
-基于这样的观察，我们有不同的思路求解：</p>
-<h3 id="solve1-分治">solve1 分治</h3>
-<p>我们枚举l，r代表的前后缀值的话，那么中间这部分怎么加进来呢?如何防止l&gt;r呢
-(毕竟不同的值都转化成了gcd value) 我们考虑设定一个枚举范围 $ [l,r],mid =
-(l+r)/2 $ ,枚举所有的<span class="math inline">\(l \le i \le
-mid\)</span>和<span class="math inline">\((mid +1) \le j \le r\)</span>
-这个时候所有跨 <span class="math inline">\(mid\)</span> 和 <span
-class="math inline">\(mid+1\)</span>
-间隙的值都被遍历到了，只剩两个子区间内部的没有被枚举。
-于是我们递归地取求解 <span class="math inline">\([l,mid]\)</span> 和
-<span class="math inline">\([mid+1,r]\)</span> ，而对于 <span
-class="math inline">\(l = r\)</span> 的区间我们特别枚举答案 <span
-class="math inline">\(\{l,r\}\)</span> (因为按照前面的规则的话 <span
-class="math inline">\([l,r]\)</span>
-是没有贡献对的，这样会漏，但是如果我们扩大 <span
-class="math inline">\([l,r]\)</span>
-的贡献对范围的话，导致重复贡献将难以处理。)
-通过这样的递归，或者说是分治策略，我们按值枚举不重不漏地遍历了所有组合</p>
-<p>那么如何通过<strong>按值枚举</strong>快速求出一个枚举范围 <span
-class="math inline">\([l,r]\)</span> 所有的 <span
-class="math inline">\(value(\{i,j\})\)</span> 呢
-根据前面的分治策略，我们把三段gcd的复合转化成以mid为界的两段gcd的复合：(以数组a最终的gcd为例)
-<span class="math display">\[p[i] =
-\gcd(a_l,a_{l+1},...,a_{i-1},b_i,b_{i+1},...,b_{mid})\]</span> <span
-class="math display">\[s[j] =
-\gcd(b_{mid+1},b_{mid+2},...b_{j},a_{j+1},...,a_{r})\]</span> 由于对
-<span class="math inline">\(a,b\)</span> 均要求出 <span
-class="math inline">\(p[i] , s[j]\)</span> ,
-我们用map&lt;pair&lt;int,int&gt;&gt;<span
-class="math inline">\(pmp,smp\)</span>( <span
-class="math inline">\(a,b\)</span> 相同位置的 <span
-class="math inline">\(p[i],s[j]\)</span>
-成一组存储，作为相异的键，值则为其数量)存储这样的 <span
-class="math inline">\(p[i]\)</span> 的值和 <span
-class="math inline">\(s[j]\)</span> 的值。
-再利用一点点前缀和后缀和，我们便可以用<span
-class="math inline">\(O(n)\)</span>的时间<strong>分别</strong>遍历<span
-class="math inline">\(i,j\)</span>的所有取值 随后我们用两层循环遍历<span
-class="math inline">\(pmp,smp\)</span>，将所有值的组合纳入答案
-由前面的观察，这个部分的时间复杂度是<span
-class="math inline">\(O(\log^2n)\)</span>
-那么，我们处理每个区间的时间复杂度为： <span
-class="math inline">\(O(n+\log^2n) = O(n)\)</span>
-这是一个分治算法，那么整体复杂度为 <span class="math inline">\(O(n\log
-n)\)</span>，足以通过本题。</p>
-]]></content>
-      <categories>
-        <category>题解</category>
-        <category>Codeforces</category>
-        <category>Contest</category>
-      </categories>
-  </entry>
-  <entry>
     <title>Week6 Training</title>
     <url>/2024/10/22/%E9%A2%98%E8%A7%A3/Codeforces/ProblemSet/week6/</url>
     <content><![CDATA[<h1 id="g.-milky-days"><a
@@ -164,6 +84,86 @@ Code:
         <category>题解</category>
         <category>Codeforces</category>
         <category>ProblemSet</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>CF Round 972 div2</title>
+    <url>/2024/10/21/%E9%A2%98%E8%A7%A3/Codeforces/Contest/cf_round972_div2/</url>
+    <content><![CDATA[<h1 id="c.-lazy-narek"><a
+href="https://codeforces.com/contest/2005/problem/C">C. Lazy
+Narek</a></h1>
+<p>dp即可； <strong>不过一定要好好读题才行！！</strong>
+就是读题读假了和不仔细，才导致vp赛时没有调出来。
+这个dp的优化(或者是自然而然的处理)：数组开1维5个位置即可，不需要对m轮全部开一个位置，否则会tle。状态转移时记得滚动，不要在原数组上面改，否则会出问题(可能跑出来同一层选了两次的结果)</p>
+<h1 id="d.-alter-the-gcd"><a
+href="https://codeforces.com/contest/2005/problem/D">D. Alter the
+GCD</a></h1>
+<h3 id="analysis">analysis</h3>
+<p>前缀和后缀和gcd自然不用多说。逐一枚举<span
+class="math inline">\(\{l，r\}\)</span>即使每次枚举求值是<span
+class="math inline">\(O(1)\)</span>也会tle。所以要寻求更好的方法求解。</p>
+<p>由于一个数的质因子最多只有<span class="math inline">\(\log
+n\)</span>个，考虑gcd prefix是单调非升的，那么有如下性质： 只有最多<span
+class="math inline">\(\log n\)</span>个位置 <span
+class="math inline">\(i\)</span> 使 $ prefix[i] &gt; prefix[i+1] $
+,其余均为 <span class="math inline">\(prefix[i] = prefix[i+1]\)</span>
+对suffix gcd类似。 那么实际上，绝大多数前后缀gcd是相等的。 如果枚举<span
+class="math inline">\(\{l，r\}\)</span>是对于<span
+class="math inline">\(l\)</span>或<span
+class="math inline">\(r\)</span>都是<span
+class="math inline">\(O(n)\)</span>，组合起来是<span
+class="math inline">\(O(n^2)\)</span>的的话，我们枚举单个变量的前缀/后缀值可以把这个枚举降到一个<span
+class="math inline">\(O(\log n)\)</span>的时间复杂度
+基于这样的观察，我们有不同的思路求解：</p>
+<h3 id="solve1-分治">solve1 分治</h3>
+<p>我们枚举l，r代表的前后缀值的话，那么中间这部分怎么加进来呢?如何防止l&gt;r呢
+(毕竟不同的值都转化成了gcd value) 我们考虑设定一个枚举范围 $ [l,r],mid =
+(l+r)/2 $ ,枚举所有的<span class="math inline">\(l \le i \le
+mid\)</span>和<span class="math inline">\((mid +1) \le j \le r\)</span>
+这个时候所有跨 <span class="math inline">\(mid\)</span> 和 <span
+class="math inline">\(mid+1\)</span>
+间隙的值都被遍历到了，只剩两个子区间内部的没有被枚举。
+于是我们递归地取求解 <span class="math inline">\([l,mid]\)</span> 和
+<span class="math inline">\([mid+1,r]\)</span> ，而对于 <span
+class="math inline">\(l = r\)</span> 的区间我们特别枚举答案 <span
+class="math inline">\(\{l,r\}\)</span> (因为按照前面的规则的话 <span
+class="math inline">\([l,r]\)</span>
+是没有贡献对的，这样会漏，但是如果我们扩大 <span
+class="math inline">\([l,r]\)</span>
+的贡献对范围的话，导致重复贡献将难以处理。)
+通过这样的递归，或者说是分治策略，我们按值枚举不重不漏地遍历了所有组合</p>
+<p>那么如何通过<strong>按值枚举</strong>快速求出一个枚举范围 <span
+class="math inline">\([l,r]\)</span> 所有的 <span
+class="math inline">\(value(\{i,j\})\)</span> 呢
+根据前面的分治策略，我们把三段gcd的复合转化成以mid为界的两段gcd的复合：(以数组a最终的gcd为例)
+<span class="math display">\[p[i] =
+\gcd(a_l,a_{l+1},...,a_{i-1},b_i,b_{i+1},...,b_{mid})\]</span> <span
+class="math display">\[s[j] =
+\gcd(b_{mid+1},b_{mid+2},...b_{j},a_{j+1},...,a_{r})\]</span> 由于对
+<span class="math inline">\(a,b\)</span> 均要求出 <span
+class="math inline">\(p[i] , s[j]\)</span> ,
+我们用map&lt;pair&lt;int,int&gt;&gt;<span
+class="math inline">\(pmp,smp\)</span>( <span
+class="math inline">\(a,b\)</span> 相同位置的 <span
+class="math inline">\(p[i],s[j]\)</span>
+成一组存储，作为相异的键，值则为其数量)存储这样的 <span
+class="math inline">\(p[i]\)</span> 的值和 <span
+class="math inline">\(s[j]\)</span> 的值。
+再利用一点点前缀和后缀和，我们便可以用<span
+class="math inline">\(O(n)\)</span>的时间<strong>分别</strong>遍历<span
+class="math inline">\(i,j\)</span>的所有取值 随后我们用两层循环遍历<span
+class="math inline">\(pmp,smp\)</span>，将所有值的组合纳入答案
+由前面的观察，这个部分的时间复杂度是<span
+class="math inline">\(O(\log^2n)\)</span>
+那么，我们处理每个区间的时间复杂度为： <span
+class="math inline">\(O(n+\log^2n) = O(n)\)</span>
+这是一个分治算法，那么整体复杂度为 <span class="math inline">\(O(n\log
+n)\)</span>，足以通过本题。</p>
+]]></content>
+      <categories>
+        <category>题解</category>
+        <category>Codeforces</category>
+        <category>Contest</category>
       </categories>
   </entry>
 </search>
