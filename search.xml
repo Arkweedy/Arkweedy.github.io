@@ -98,7 +98,7 @@ Narek</a></h1>
 <h1 id="d.-alter-the-gcd"><a
 href="https://codeforces.com/contest/2005/problem/D">D. Alter the
 GCD</a></h1>
-<h3 id="analysis">analysis</h3>
+<h2 id="analysis">analysis</h2>
 <p>前缀和后缀和gcd自然不用多说。逐一枚举<span
 class="math inline">\(\{l，r\}\)</span>即使每次枚举求值是<span
 class="math inline">\(O(1)\)</span>也会tle。所以要寻求更好的方法求解。</p>
@@ -115,7 +115,7 @@ class="math inline">\(O(n)\)</span>，组合起来是<span
 class="math inline">\(O(n^2)\)</span>的的话，我们枚举单个变量的前缀/后缀值可以把这个枚举降到一个<span
 class="math inline">\(O(\log n)\)</span>的时间复杂度
 基于这样的观察，我们有不同的思路求解：</p>
-<h3 id="solve1-分治">solve1 分治</h3>
+<h2 id="solve1-分治">solve1 分治</h2>
 <p>我们枚举l，r代表的前后缀值的话，那么中间这部分怎么加进来呢?如何防止l&gt;r呢
 (毕竟不同的值都转化成了gcd value) 我们考虑设定一个枚举范围 $ [l,r],mid =
 (l+r)/2 $ ,枚举所有的<span class="math inline">\(l \le i \le
@@ -164,6 +164,102 @@ n)\)</span>，足以通过本题。</p>
         <category>题解</category>
         <category>Codeforces</category>
         <category>Contest</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>CF Round974 div3</title>
+    <url>/2024/10/21/%E9%A2%98%E8%A7%A3/Codeforces/Contest/cf_round974_div3/</url>
+    <content><![CDATA[<h1 id="d-robert-hood-and-mrs-hood"><a
+href="https://codeforces.com/contest/2014/problem/D">D Robert Hood and
+Mrs Hood</a></h1>
+<p>赛时对l,r分别进行了排序,来测算是否有事件进入，实际上这是没有必要的。</p>
+<p>可以直接用一个桶来记录。buc[l]--,buc[r+1]--即可。</p>
+<p>不难，时间复杂度为<span class="math inline">\(O(n)\)</span></p>
+<h1 id="e---rendez-vous-de-marian-et-robin"><a
+href="https://codeforces.com/contest/2014/problem/E">E - Rendez-vous de
+Marian et Robin</a></h1>
+<p>赛时魔改dijkstra没有改出来(实际上应该也很难改出来)
+赛后了解到分层图，直接开悟
+做法是对每个节点，建图建一个有马节点，一个无马节点，有horse的节点就让无马节点向有马节点连边。对于给出的边，有马图和无马图同步建图。最后跑一遍Dijkstra就行。</p>
+<h1 id="f---sheriffs-defense"><a
+href="https://codeforces.com/contest/2014/problem/F">F - Sheriff's
+Defense</a></h1>
+<p>由于给出的是树形结构，可以当作一颗有根树。
+和图最大的不同点是这样的树上问题可以做到无后效性(考虑树上dfs，不会有背向边或者横叉边)，换言之就是可以dp/dfs
+(虽然我一开始想试试贪心，但是最后也没有试出来，而且时间复杂度上是不如dp的，实现上也比dp难，所以说dp好啊)
+由于一个节点有两种状态，每个节点的贡献仅由这个节点和相邻节点决定。
+于是我们考虑有根树上的状态转移： 两个相邻节点都取的话，总贡献减去<span
+class="math inline">\(2c\)</span> 取<span
+class="math inline">\(S_u\)</span>为<span
+class="math inline">\(u\)</span>节点的子节点集合，<span
+class="math inline">\(dp[u]\)</span>为子树的贡献</p>
+<p><span class="math inline">\(dp[u][0] = \sum_{v\in S_u}
+\max(dp[v][0],dp[v][1])\)</span> <span class="math inline">\(dp[u][1] =
+\sum_{v\in S_u} \max(dp[v][0],dp[v][1]-2c)\)</span></p>
+<p>实现用dfs实现即可。</p>
+<p>核心代码： <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">//dp1用a[i]初始化</span></span><br><span class="line"><span class="built_in">dfs</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; g[p].<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (g[p][i] != fa) &#123;</span><br><span class="line">            <span class="built_in">dfs</span>(g, a, dp0, dp1, g[p][i], p, c);</span><br><span class="line">            dp0[p] += <span class="built_in">max</span>(dp0[g[p][i]], dp1[g[p][i]]);</span><br><span class="line">            dp1[p] += <span class="built_in">max</span>(dp0[g[p][i]], dp1[g[p][i]] - c * <span class="number">2</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+]]></content>
+      <categories>
+        <category>题解</category>
+        <category>Codeforces</category>
+        <category>Contest</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Week3 Training</title>
+    <url>/2024/09/21/%E9%A2%98%E8%A7%A3/Codeforces/ProblemSet/week3/</url>
+    <content><![CDATA[<h1 id="h.-sakurakos-test"><a
+href="https://codeforces.com/contest/2008/problem/H">2008H. Sakurako's
+Test</a></h1>
+<p>关键是前缀和和二分 以及对边界做一点特殊处理防止前缀数组越界
+二分有说法的，要通过二分找到右边界(和中位数定义有关)
+或许还可以改改代码，感觉自己写的有点怪</p>
+<h1 id="g.-ultra-meow"><a
+href="https://codeforces.com/contest/1992/problem/G">1992G.
+Ultra-Meow</a></h1>
+<p>看清这题的数据范围，对<span class="math inline">\(\sum
+n^2\)</span>做了限制，所以单测<span
+class="math inline">\(O(n^2)\)</span>的复杂度是没有问题的，不需要预处理所有答案然后<span
+class="math inline">\(O(1)\)</span>查询。 做法是对于每个可能的<span
+class="math inline">\(k = mex(S)\)</span>,对<span
+class="math inline">\(k\)</span>分讨，算出每种k的贡献次数即可，复杂度<span
+class="math inline">\(O(n^2)\)</span>。 需要一点点组合。
+组合的板子在对负数的处理上好像有不兼容的的地方？
+<strong>回头看看，改一下板子，这句话还在这里就表示没有修改板子以及搞清楚原因</strong></p>
+]]></content>
+      <categories>
+        <category>题解</category>
+        <category>Codeforces</category>
+        <category>ProblemSet</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Week4 Training</title>
+    <url>/2024/09/28/%E9%A2%98%E8%A7%A3/Codeforces/ProblemSet/week4/</url>
+    <content><![CDATA[<h1 id="d.-the-omnipotent-monster-killer"><a
+href="https://codeforces.com/contest/1988/problem/D">1988D. The
+Omnipotent Monster Killer</a></h1>
+<p>由于只有相邻节点之间才有影响，树形dp即可。
+权值每次至少减半，故杀死所有怪物的轮数不会超过<span
+class="math inline">\(\log n\)</span>轮，相邻节点删去的轮数不同。
+在有根树上dp，<span
+class="math inline">\(dp[i][j]\)</span>代表在节点i在第j轮删除时，节点<span
+class="math inline">\(i\)</span>子树的最小贡献。 状态转移： <span
+class="math inline">\(dp[i][j] = \sum_{v\in S_i}\min(dp[v][k]),k \neq
+j\)</span></p>
+<h1 id="e.-level-up"><a
+href="https://codeforces.com/contest/1997/problem/E">1977E. Level
+Up</a></h1>
+<p>线段树+二分 第一次用自己写的线段树板子，爽捏。
+对于每个位置，大于最小答案的每个k的取值都可以满足要求，故可以二分答案。check是计算答案为k时，前面的最小答案在1-k区间内的个数(即获得的exp)，然后按照题意判断即可。
+<strong>一定要注意整型溢出的问题！！！</strong>
+(因为在check的时候，使用了mid*a[i]与exp比较大小，而mid*a[i]是可能溢出的。)
+(当然，可以直接比exp/mid 和a[i]) 核心代码： <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">SegTree&lt;<span class="type">int</span>&gt; <span class="title">t</span><span class="params">(n)</span></span>;</span><br><span class="line">t.<span class="built_in">build</span>();</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">    <span class="type">int</span> ng = <span class="number">0</span>, ok = i + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (ok - ng &gt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> mid = (ng + ok) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> exp = t.<span class="built_in">qry</span>(<span class="number">1</span>, mid);</span><br><span class="line">        <span class="keyword">if</span> (exp / mid &gt;= a[i]) &#123;</span><br><span class="line">            ng = mid;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            ok = mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ans[i] = ok;</span><br><span class="line">    t.<span class="built_in">upd</span>(ok, ok, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+]]></content>
+      <categories>
+        <category>题解</category>
+        <category>Codeforces</category>
+        <category>ProblemSet</category>
       </categories>
   </entry>
 </search>
