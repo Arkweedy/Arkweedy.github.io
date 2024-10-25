@@ -301,8 +301,8 @@ Sort4</a></p>
 <p>首先我们明确一个<span class="math inline">\(1 -n\)</span>的排列<span
 class="math inline">\(p\)</span>，由<span
 class="math inline">\(i\)</span>向<span
-class="math inline">\(p[i]\)</span>连边构成的有向图的结构： 1.
-这个图只由若干个不相交的环构成(自环也算环)<br />
+class="math inline">\(p[i]\)</span>连边构成的有向图的结构：<br />
+1. 这个图只由若干个不相交的环构成(自环也算环)<br />
 2. 图中不存在链或者指向环的链(原因：<span
 class="math inline">\(p[i]\)</span>的值不同)</p>
 <p>再看题意，实际上就是需要我们通过若干次交换操作使这个图只由大小为1或者2的环组成。
