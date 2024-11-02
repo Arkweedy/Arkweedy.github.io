@@ -363,7 +363,7 @@ class="math display">\[pathlen(u,v) = deep(u)+deep(v) -
       </categories>
   </entry>
   <entry>
-    <title>CF Round981 div3</title>
+    <title>CF Round982 div2</title>
     <url>/2024/11/02/%E9%A2%98%E8%A7%A3/Codeforces/Contest/cf_round982_div2/</url>
     <content><![CDATA[<h2 id="比赛入口"><a
 href="https://codeforces.com/contest/2027">比赛入口</a></h2>
@@ -422,7 +422,7 @@ class="math inline">\(path[i]\)</span>,最优区间右端点为<span
 class="math inline">\(lr - 1\)</span><br />
 有状态转移方程： <span class="math display">\[dp[r] = \min(dp[r],dp[l-1]
 + m-i)\]</span><br />
-[ path[r]={
+[ path[r] = {
 <span class="math display">\[\begin{array}{ll}
                   \sum_{i = l}^{lr}path[i] &amp;,dp[r] &gt;
 dp[l-1]+m-i\\
