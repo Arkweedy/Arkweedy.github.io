@@ -362,4 +362,87 @@ class="math display">\[pathlen(u,v) = deep(u)+deep(v) -
         <category>Contest</category>
       </categories>
   </entry>
+  <entry>
+    <title>CF Round981 div3</title>
+    <url>/2024/11/02/%E9%A2%98%E8%A7%A3/Codeforces/Contest/cf_round982_div2/</url>
+    <content><![CDATA[<h2 id="比赛入口"><a
+href="https://codeforces.com/contest/2027">比赛入口</a></h2>
+<h1 id="c"><a
+href="https://codeforces.com/contest/2027/problem/C">C</a></h1>
+<p>很简单，建图找一下最远点即可。<br />
+不过因为点值比较离散，所以用map存邻接表(cf传统艺能卡ump，所以还是不用的好)。<br />
+code:<br />
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">dfs</span><span class="params">(map&lt;ll, vector&lt;ll&gt;&gt;&amp; nxt, map&lt;ll, <span class="type">bool</span>&gt;&amp; vs, ll p, ll &amp;ans)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vs[p] = <span class="literal">true</span>;</span><br><span class="line">    ans = <span class="built_in">max</span>(ans, p);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> s : nxt[p]) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!vs[s] &amp;&amp; s != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">dfs</span>(nxt, vs, s,ans);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    vector&lt;ll&gt;<span class="built_in">a</span>(n + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; a[i];</span><br><span class="line">    &#125;</span><br><span class="line">    map&lt;ll, vector&lt;ll&gt;&gt;nxt;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        nxt[a[i] + i <span class="number">-1</span>].<span class="built_in">push_back</span>(a[i] + i * <span class="number">2</span> - <span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    map&lt;ll,<span class="type">bool</span>&gt;vs;</span><br><span class="line">    ll ans = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">dfs</span>(nxt, vs, n, ans);</span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="d"><a
+href="https://codeforces.com/contest/2027/problem/D2">D</a></h1>
+D1需要求解最少cost,D2还要求解最少cost的方案数。<br />
+## D1 部分 首先分析题意，可以发现这是一个类似完全背包的问题。<br />
+所以我们可以背包dp解决。<br />
+设定状态<span class="math inline">\(dp[i]\)</span>为取完<span
+class="math inline">\(a_1 ... a_i\)</span>的最小费用。显然<span
+class="math inline">\(dp\)</span>数组是单调非降的。对于每个下标<span
+class="math inline">\(r\)</span>,设<span
+class="math inline">\(l\)</span>是满足<span
+class="math inline">\(\sum_{k=l}^{r} a[k] \leq
+b[i]\)</span>的最小值，那么从<span
+class="math inline">\(l-1\)</span>转移到<span
+class="math inline">\(r\)</span>一定是最优的。于是有状态转移方程：<br />
+<span class="math display">\[dp[r] = \min(dp[r],dp[l-1] +
+m-i)\]</span><br />
+于是问题转移到如何对于每一个<span
+class="math inline">\(r\)</span>，在可以容忍的时间限下求出<span
+class="math inline">\(l\)</span>。<br />
+对此，我们可以使用双指针。想象一个队列,队尾为<span
+class="math inline">\(l\)</span>，待加入元素为<span
+class="math inline">\(a[r]\)</span><br />
+1. 当剩余容积<span class="math inline">\(rem\)</span>大于等于物品<span
+class="math inline">\(a[r]\)</span>的cost时，加入<span
+class="math inline">\(a[r]\)</span>,此时的<span
+class="math inline">\(\{l,r\}\)</span>即为一组合法的转移参数，于是执行转移。<br />
+2. 当剩余容积<span class="math inline">\(rem\)</span>小于物品<span
+class="math inline">\(a[r]\)</span>的cost时，我们弹出队尾元素，更新剩余容积。<br />
+3. 特殊情况，当队列为空，且剩余容积<span
+class="math inline">\(rem\)</span>小于物品<span
+class="math inline">\(a[r]\)</span>的cost时，我们跳过这个物品。(操作即为l++,r++)<br />
+这样，我们便可以<span
+class="math inline">\(O(mn)\)</span>求得答案。<br />
+可以预处理出所有的<span
+class="math inline">\({l,r}\)</span>(官方题解),不过我就边求边dp了。<br />
+code(D1 dp部分):<br />
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">vector&lt;ll&gt;<span class="built_in">dp</span>(n + <span class="number">1</span>, inf);</span><br><span class="line">dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= m; i++) &#123;</span><br><span class="line">    <span class="type">int</span> l = <span class="number">1</span>, r = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> rem = b[i];</span><br><span class="line">    <span class="keyword">for</span> (; r &lt;= n; ) &#123;</span><br><span class="line">        <span class="keyword">if</span> (rem &gt;= a[r]) &#123;</span><br><span class="line">            rem -= a[r];</span><br><span class="line">            dp[r] = <span class="built_in">min</span>(dp[r], dp[l - <span class="number">1</span>] + m - i);</span><br><span class="line">            r++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (l == r) &#123;</span><br><span class="line">                l++;</span><br><span class="line">                r++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                rem += a[l];</span><br><span class="line">                l++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (dp[n] == inf) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="number">-1</span> &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    cout &lt;&lt; dp[n] &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> ## D2部分 在求解D1的过程中，我们选取的是一定最优的<span
+class="math inline">\(\{l,r\}\)</span>对进行转移,但实际上同等优的可以有很多对，而我们想要计数最优方案的话，就要转移所有同等优的(计数所有同等优的)才行。
+那么这实际上是一个从左区间到右点的转移，其他题解有用线段树进行区间转移优化的，不过实际上不需要，用双指针仍能做到，而且时间复杂度更优。
+前面所说"同等优的转移"很模糊，实际上，"同等优"的左区间即为<span
+class="math inline">\(dp\)</span>值相同的区间，那么最优区间是和<span
+class="math inline">\(dp[l]\)</span>值相同的区间，这个区间的内的任何点转移到<span
+class="math inline">\(r\)</span>的值是一样的，所以我们可以把这个区间的转移变成一次转移，对计数的贡献则是最优区间内所有方案数相加。(想想这是为什么)<br />
+设取完<span
+class="math inline">\(1-i\)</span>d的最优方案数(最优转移路径数)为<span
+class="math inline">\(path[i]\)</span>,最优区间右端点为<span
+class="math inline">\(lr - 1\)</span><br />
+有状态转移方程： <span class="math display">\[dp[r] = \min(dp[r],dp[l-1]
++ m-i)\]</span><br />
+[ path[r]={
+<span class="math display">\[\begin{array}{ll}
+                  \sum_{i = l}^{lr}path[i] &amp;,dp[r] &gt;
+dp[l-1]+m-i\\
+                  path[r] +\sum_{i = l}^{lr}path[i] &amp;,dp[r] =
+dp[l-1]+m-i\\
+                  path[r] &amp;,dp[r] &lt; dp[l-1]+m-i\\
+                \end{array}\]</span>
+<p>. ]</p>
+<p>所以，我们需要在D1的基础上，对于求出所有<span
+class="math inline">\(r\)</span>的最优转移区间<span
+class="math inline">\(\{l,lr\}\)</span>,而这个也可以通过双指针做到(注意性质:当<span
+class="math inline">\(r\)</span>增大时，<span
+class="math inline">\(lr\)</span>同样是单调非降的！)。<br />
+具体实现先思考一下会更好，以下是D2部分代码<br />
+code: <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> n, m;</span><br><span class="line">    cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(n + <span class="number">1</span>), <span class="built_in">b</span>(m + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; a[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= m; i++) &#123;</span><br><span class="line">        cin &gt;&gt; b[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//a.push_back(inf);</span></span><br><span class="line">    vector&lt;ll&gt;<span class="built_in">dp</span>(n + <span class="number">1</span>, inf);</span><br><span class="line">    vector&lt;ll&gt;<span class="built_in">pa</span>(n + <span class="number">1</span>, <span class="number">0</span>);<span class="comment">//path</span></span><br><span class="line">    dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    pa[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= m; i++) &#123;</span><br><span class="line">        <span class="type">int</span> l = <span class="number">1</span>, r = <span class="number">1</span>, lr = <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> rem = b[i];</span><br><span class="line">        ll cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (; r &lt;= n; ) &#123;</span><br><span class="line">            <span class="keyword">if</span> (lr &lt; l) &#123;</span><br><span class="line">                cout &lt;&lt; <span class="string">&quot;error&quot;</span> &lt;&lt; endl;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (rem &gt;= a[r]) &#123;</span><br><span class="line">                rem -= a[r];</span><br><span class="line">                <span class="keyword">while</span> (dp[lr<span class="number">-1</span>] == dp[l<span class="number">-1</span>] &amp;&amp; lr &lt;= r) &#123;<span class="comment">//lr == r : r-1 -&gt; r </span></span><br><span class="line">                    cnt = (cnt + pa[lr<span class="number">-1</span>]) % mod;</span><br><span class="line">                    lr++;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (dp[l<span class="number">-1</span>] + m - i &lt; dp[r]) &#123;</span><br><span class="line">                    dp[r] = dp[l<span class="number">-1</span>] + m - i;</span><br><span class="line">                    pa[r] = cnt;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (dp[l<span class="number">-1</span>] + m - i == dp[r]) &#123;</span><br><span class="line">                    pa[r] = (pa[r] + cnt) % mod;</span><br><span class="line">                &#125;</span><br><span class="line">                r++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (l == r) &#123;</span><br><span class="line">                    l++;</span><br><span class="line">                    lr++;</span><br><span class="line">                    r++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    rem += a[l];</span><br><span class="line">                    cnt = (cnt + mod - pa[l - <span class="number">1</span>]) % mod;;</span><br><span class="line">                    l++;</span><br><span class="line">                    <span class="keyword">while</span> (lr &lt; l) &#123;</span><br><span class="line">                        cnt = (cnt + pa[lr - <span class="number">1</span>]) % mod;</span><br><span class="line">                        lr++;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (dp[n] == inf) &#123;</span><br><span class="line">        cout &lt;&lt; <span class="number">-1</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        cout &lt;&lt; dp[n] &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; pa[n] &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+]]></content>
+      <categories>
+        <category>题解</category>
+        <category>Codeforces</category>
+        <category>Contest</category>
+      </categories>
+  </entry>
 </search>
