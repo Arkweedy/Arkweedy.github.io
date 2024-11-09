@@ -679,7 +679,8 @@ class="math inline">\(S\)</span>位置<span
 class="math inline">\((s,t)\)</span>时元素<span
 class="math inline">\(p_i\)</span>的下标<span
 class="math inline">\(i\)</span>。<br />
-可以预见: 1. <span
+可以预见:<br />
+1. <span
 class="math inline">\(Q\)</span>中元素也满足杨表的偏序关系(构造时是在已有格子的下方或右方插入更大的元素),故<span
 class="math inline">\(Q\)</span>也是一个杨表。<br />
 2. 且<span class="math inline">\(S\)</span>和<span
