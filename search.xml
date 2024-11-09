@@ -644,10 +644,10 @@ class="math inline">\(M\)</span>。</p>
 <h2 id="part-2.杨表">Part 2.杨表</h2>
 <p>解决这题需要一些前置知识：杨表<br />
 英式画法的杨表由有限个相邻的方格排列而成，其中，各横行的左边对齐，长度从上到下递增。<br />
-<img src="\image\article_pics\at_evG\378\Completely-Young-diagram.png"
+<img src="\image\article_pics\at_evG\378\young-diagram-1.png"
 alt="英式杨表" /> 标准杨表：在杨表的
 n个方格中任意填入1到n中的相异正整数，各行和各列中的数字皆严格递增。<br />
-<img src="\image\article_pics\at_evG\378\young-diagram-1.png"
+<img src="\image\article_pics\at_evG\378\Completely-Young-diagram.png"
 alt="标准杨表" />
 显然，杨表代表着一种二维表示的偏序。而这种拓扑序可以与一个排列的LIS和LDS相关联。<br />
 引入RSK算法(杨表的插入算法)：<br />
