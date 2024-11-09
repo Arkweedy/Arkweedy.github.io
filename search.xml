@@ -702,12 +702,15 @@ class="math inline">\(S\)</span>的第一行元素个数，LDS等于<span
 class="math inline">\(S\)</span>的第一列元素个数。<br />
 2. <span class="math inline">\(f : \mathbb{P} \rightarrow \sum_{all
 \lambda_i} \mathbb{S_{\lambda_i}} \times
-\mathbb{S_{\lambda_i}}\)</span>是双射。即从使用上文所属的RSK插入算法，不同排列得到的杨表对是不同的(单射)。更为重要的是这还是一个满射，也就是说可以得到所有的杨表对。<br />
+\mathbb{S_{\lambda_i}}\)</span>是双射。即从使用上文所属的RSK插入算法，不同排列得到的杨表对是不同的(单射)。更为重要的是这还是一个满射，也就是说可以得到所有的杨表对。因此也有：<span
+class="math display">\[n! = A^n_n = \sum_{all \lambda}{(\dim
+\pi_{\lambda})}^2\]</span><br />
 3. 对于对于杨表中的一个方格<span
 class="math inline">\(v\)</span>，定义其勾长<span
 class="math inline">\(\mathrm{hook}(v)\)</span>等于同行右边的方格数加上同列上面的方格数，再加<span
 class="math inline">\(1\)</span>（即方格本身）。如果用<span
-class="math inline">\(dim_{\lambda}\)</span>表示这样的方法个数，方法个数就等于<span
+class="math inline">\(\dim
+\pi_{\lambda}\)</span>表示这样的方法个数，方法个数就等于<span
 class="math inline">\(n!\)</span>除以所有方格的勾长的乘积。<br />
 有钩长公式:<span class="math display">\[\dim \pi _{\lambda} =
 \frac{n!}{\prod_{x \in Y(\lambda)} \mathrm{hook}(x)}\]</span></p>
