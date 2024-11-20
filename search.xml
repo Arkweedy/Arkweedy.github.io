@@ -968,7 +968,7 @@ class="math inline">\(sum[f]\)</span>前乘上的系数是0.</p>
 <p>如果你学过Möbius函数，我们会发现我们在<span
 class="math inline">\(sum[f]\)</span>前乘上的系数简直就是<span
 class="math inline">\(\mu(x)\)</span>的定义！唯一不同的是正负刚好相反。</p>
-<p><span class="math inline">\(\mu\)</span> 为莫比乌斯函数，定义为</p>
+<span class="math inline">\(\mu\)</span> 为莫比乌斯函数，定义为
 <p><span
 class="math inline">\(\mu\)</span>是一个积性函数，而几乎所有的积性函数都可以使用欧拉筛法以线性时间筛出来，<span
 class="math inline">\(\mu\)</span>并不例外。<br />
