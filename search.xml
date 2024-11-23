@@ -1003,4 +1003,71 @@ code:<br />
         <category>Contest</category>
       </categories>
   </entry>
+  <entry>
+    <title>ABC379 每日一寄4th</title>
+    <url>/2024/11/23/%E9%A2%98%E8%A7%A3/Atcoder/EverydayG/ABC376G/</url>
+    <content><![CDATA[<h1 id="abc376-g---treasure-hunting"><a
+href="https://atcoder.jp/contests/abc376/tasks/abc376_g">ABC376 G -
+Treasure Hunting</a></h1>
+<p><em>相关算法：贪心，组合数学</em></p>
+<h2 id="part-1-题意简述">Part 1 题意简述</h2>
+<p>给定一颗<span class="math inline">\(n+1\)</span>个节点的以<span
+class="math inline">\(0\)</span>为根的树,每个点有点权<span
+class="math inline">\(v\)</span>,每个点有宝藏的概率为<span
+class="math inline">\(\frac{v_i}{\sum
+v}\)</span>。认为根已搜寻，可以搜寻一个节点当且仅当搜寻过它的父节点。求搜寻到宝藏的步数的最小期望。<br />
+当然，这个题意可以变换一下，即求一个访问序列<span
+class="math inline">\(p\)</span>(这是一个长为<span
+class="math inline">\(n\)</span>的排列)最小化<span
+class="math inline">\(\sum_{i = 1}^{n} i\cdot
+v_{p_i}\)</span>(这里我们提出来公因子<span
+class="math inline">\(\frac{1}{\sum v}\)</span>),<span
+class="math inline">\(p\)</span>中父节点的下标严格小于子节点的下标。<br />
+数据范围: <span class="math inline">\(1≤N≤2×10^5\)</span>, <span
+class="math inline">\(\sum v \leq 1 \times 10^8\)</span></p>
+<h2 id="part-2-分析">Part 2 分析</h2>
+<p>这是一个树上问题，可能我们会想到做一个树形dp，但是这不好做到无后效性，因为实际上可能在很长的间隔下选取同一颗子树的一些节点。<br />
+由于这是一个最优化的问题，我们可以有一个想法，就是想kruskal算法求解最小生成树一样，我们贪心地去合并一些最优的点对，最后将整棵树合并成一个点。不过这里需要注意的是我们是合并点，而不是子树，因为一次选完一棵子树可能不会是最优的。<br />
+此时我们有了一个贪心的思路，接下来我们完善它并且证明它的正确性。<br />
+我们认为每个点集有两个值：大小<span
+class="math inline">\(size\)</span>和期望值<span
+class="math inline">\(val\)</span>。其中<span
+class="math inline">\(val\)</span>代表着遍历这个点集的<strong>最大</strong>期望贡献。我们将两个点集<span
+class="math inline">\(p,fa\)</span> (<span
+class="math inline">\(fa\)</span>是<span
+class="math inline">\(p\)</span>的父点集) 合并成新的点集时，有 <span
+class="math display">\[size =  size_p + size_{fa}, val = val_{fa} +
+size_{fa}\times val_p\]</span> 我们贪心地在每一步都选择让全局<span
+class="math inline">\(\sum
+val\)</span>增量最大的合并方式，如果我们将合并增量<span
+class="math inline">\(size_{fa}\times val_p\)</span>当作边<span
+class="math inline">\(\{fa,p\}\)</span>的边权，那么我们要做的就是每次选取边权最大的边做合并。最后合并到只剩一个点集时，我们得到的期望值<span
+class="math inline">\(val\)</span>就是<strong>最小</strong>期望值。<br />
+这一听或许很怪，毕竟我们贪心选择最大的合并方式，反而得到的是最小的期望值。但是仔细想想，我们优先访问大的增量的，那么在访问顺序上它会靠前，最终乘上的就是一个相对较小的系数。反而我们如果贪心选择最小增量的合并方式，那么最终最大的合并方式会乘上一个最大的系数，导致我们的期望值是最大的。<br />
+当然，我们只是形式上分析了一下为什么这种贪心方式是最小期望的，严谨的证明如下(之后再补)。</p>
+<h2 id="part-3-优化">Part 3 优化</h2>
+<p>虽然我们的贪心选法和kruskal生成树的求法很像，但这并不是<span
+class="math inline">\(O(n\log
+n)\)</span>的算法，因为我们每次合并会改变<span
+class="math inline">\(size\)</span>值，进而改于其相连的边的边权。这导致我们每步更新和找出边权最大的边可能是<span
+class="math inline">\(O(n)\)</span>的。优化这个算法看起来很无解，不过考虑到我们定义点集的属性是仿照期望的求和式的形式去定义的，或许我们改变期望的表达式，推出一种新的贪心方法，从而得到一种新的求解最大合并增量的方式。<br />
+设<span
+class="math inline">\(v_p\)</span>数组的<strong>后缀和数组</strong>为<span
+class="math inline">\(s\)</span>,有: <span
+class="math display">\[\sum_{i = 1}^{n} i\cdot v_{p_i} = \sum_{i =
+1}^{n} s_i\]</span>
+我们做类似的点集定义，但是贪心方式变成对点去贪心。考虑到我们要最小化后缀和数组的和，我们每次选取最优的后缀和点集，把它接到它的父点集上形成一个新的后缀和。显然，这样的操作不会影响其他点集。我们再借助并查集来维护各个点集的成员，用优先队列来维护点集代表的后缀和大小，其中的偏序关系是<span
+class="math inline">\(\frac{s}{size}\)</span>的大小(按照这个大小排序，可以保证接在同一个点集上的顺序是最优的)，可以做到<span
+class="math inline">\(O(n\log n)\)</span>。我们的合并转移公式是类似的：
+<span class="math display">\[size =  size_p + size_{fa}, s = s_{fa} +
+size_{fa}\times s_p\]</span>
+这里也可以给出一个证明去证明这种方式与对边贪心是等价的。 最终的实现code:
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">node</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">int</span> idx;</span><br><span class="line">    ll c0;</span><br><span class="line">    ll c1;</span><br><span class="line">    ll val;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">node</span>(ll i, ll x, ll y)</span><br><span class="line">        :<span class="built_in">idx</span>(i),<span class="built_in">c0</span>(x), <span class="built_in">c1</span>(y),<span class="built_in">val</span>(x)</span><br><span class="line">    &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">merge</span><span class="params">(node&amp; other)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        val = val + other.val + c1 * other.c0;</span><br><span class="line">        c0 += other.c0;</span><br><span class="line">        c1 += other.c1;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">bool</span> <span class="keyword">operator</span>&lt;(<span class="type">const</span> node&amp; other)<span class="type">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> c0 * other.c1 &lt; other.c0 * c1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">bool</span> <span class="keyword">operator</span>==(<span class="type">const</span> node&amp; other)<span class="type">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">return</span> (c0 == other.c0 &amp;&amp; c1 == other.c1 &amp;&amp; val == other.val &amp;&amp; idx == other.idx);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(n + <span class="number">1</span>);</span><br><span class="line">    vector&lt;ll&gt;<span class="built_in">val</span>(n + <span class="number">1</span>);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">fa</span>(n + <span class="number">1</span>), <span class="built_in">c</span>(n + <span class="number">1</span>);</span><br><span class="line">    Z sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; fa[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; a[i];</span><br><span class="line">        sum += a[i];</span><br><span class="line">        val[i] = a[i];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">djs</span>(n + <span class="number">1</span>, <span class="number">-1</span>);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">sz</span>(n + <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    vector&lt;node&gt;nds;</span><br><span class="line">    nds.<span class="built_in">push_back</span>(<span class="built_in">node</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        nds.<span class="built_in">push_back</span>(<span class="built_in">node</span>(i, a[i], <span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">auto</span> find = [&amp;](<span class="keyword">auto</span>&amp;&amp; self, <span class="type">int</span> p)-&gt;<span class="type">int</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> djs[p] == <span class="number">-1</span> ? p : (djs[p] = <span class="built_in">self</span>(self, djs[p]));</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> Find = [&amp;](<span class="type">int</span> p)-&gt;<span class="type">int</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">find</span>(find, p);</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> Union = [&amp;](<span class="type">int</span> p, <span class="type">int</span> f)-&gt;<span class="type">void</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">int</span> a = <span class="built_in">Find</span>(p);</span><br><span class="line">            <span class="type">int</span> b = <span class="built_in">Find</span>(f);</span><br><span class="line">            <span class="keyword">if</span> (a == b)</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                djs[a] = b;</span><br><span class="line">                sz[b] += a;</span><br><span class="line">                nds[b].<span class="built_in">merge</span>(nds[a]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    priority_queue&lt;node&gt;q;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        q.<span class="built_in">push</span>(nds[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">auto</span> nd = q.<span class="built_in">top</span>();</span><br><span class="line">        q.<span class="built_in">pop</span>();</span><br><span class="line">        <span class="type">int</span> p = nd.idx;</span><br><span class="line">        <span class="built_in">Union</span>(p, fa[p]);</span><br><span class="line">        q.<span class="built_in">push</span>(nds[<span class="built_in">Find</span>(p)]);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!q.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (q.<span class="built_in">top</span>().idx != <span class="number">0</span> &amp;&amp; q.<span class="built_in">top</span>() == nds[q.<span class="built_in">top</span>().idx]) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                q.<span class="built_in">pop</span>();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    Z ans = nds[<span class="built_in">Find</span>(<span class="number">1</span>)].val;</span><br><span class="line">    ans /= sum;</span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+]]></content>
+      <categories>
+        <category>题解</category>
+        <category>Atcoder</category>
+        <category>EverydayG</category>
+      </categories>
+  </entry>
 </search>
