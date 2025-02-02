@@ -1070,4 +1070,101 @@ size_{fa}\times s_p\]</span>
         <category>EverydayG</category>
       </categories>
   </entry>
+  <entry>
+    <title>CF 2月部分题题解</title>
+    <url>/2025/02/02/%E9%A2%98%E8%A7%A3/Codeforces/Contest/2025Feb/</url>
+    <content><![CDATA[<h1 id="cf-近期题解">CF 近期题解</h1>
+<p><em>鸽了好久，感觉还是多谢题解会更有提高</em></p>
+<h2 id="d"><a
+href="https://codeforces.com/contest/2056/problem/D">2056D</a></h2>
+<p>算法： 偏序，枚举，二值化(中位数的常见方法)， 前缀和</p>
+<h3 id="题意">题意</h3>
+<p>求给定数组的所有子数组中，前中位数和后中位数相等的子数组的数量。数组值域<span
+class="math inline">\(\Omega\)</span>为<span class="math inline">\(1
+\sim 10\)</span>。数组长<span class="math inline">\(10^5\)</span>。</p>
+<h3 id="分析">分析</h3>
+<p>由于值域很小，可以枚举中位数，将小于中位数的数赋值为<span
+class="math inline">\(-1\)</span>，大于的赋值为<span
+class="math inline">\(1\)</span>。<br />
+考虑某个区间小于,等于，大于所枚举的中位数的分别有<span
+class="math inline">\(l,m,r\)</span>个，合法区间满足约束条件：<br />
+<span class="math display">\[\begin{cases}
+    l + m &gt; r \\
+    r + m &gt; l \\
+\end{cases}\]</span></p>
+<h4 id="方法一正向统计">方法一：正向统计</h4>
+<p>由此我们得到了合法区间满足的两个偏序关系：<br />
+对区间<span class="math inline">\([1,i]\)</span>,令$ f_i = l + m - r ,
+g_i = r + m - l$<br />
+对合法区间<span
+class="math inline">\([l,r]\)</span>(l,r含义与前文不同，这里是区间端点)有偏序关系<br />
+<span class="math display">\[\begin{cases}
+    f_{l-1} &lt; f_{r} \\
+    g_{l-1} &lt; g_{r} \\
+\end{cases}\]</span><br />
+于是我们事先计算好<span
+class="math inline">\(f,g\)</span>数组，跑一个二维偏序即可。要注意的是这里的偏序是严格偏序，相等不能计入数量。<br />
+二维偏序可以树状数组/分治实现。<br />
+复杂度是<span class="math inline">\(O(\Omega n\log n)\)</span><br />
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">bit</span> <span class="comment">//1 base</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    <span class="type">int</span> upper;</span><br><span class="line">    vector&lt;T&gt;tree;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">static</span> <span class="type">const</span> <span class="type">int</span> <span class="title">lowbit</span><span class="params">(<span class="type">const</span> <span class="type">int</span> x)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x &amp; -x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">bit</span>(vector&lt;T&gt; a)</span><br><span class="line">    &#123;</span><br><span class="line">        n = a.<span class="built_in">size</span>() - <span class="number">1</span>;</span><br><span class="line">        tree = a;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i + <span class="built_in">lowbit</span>(i) &lt;= n) &#123;</span><br><span class="line">                tree[i + <span class="built_in">lowbit</span>(i)] += tree[i];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        upper = n;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">lowbit</span>(upper) != upper) &#123;</span><br><span class="line">            <span class="keyword">while</span> (upper != <span class="built_in">lowbit</span>(upper)) &#123;</span><br><span class="line">                upper -= <span class="built_in">lowbit</span>(upper);</span><br><span class="line">            &#125;</span><br><span class="line">            upper &lt;&lt;= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(<span class="type">int</span> p, T x)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (p &lt;= n) &#123;</span><br><span class="line">            tree[p] += x;</span><br><span class="line">            p += <span class="built_in">lowbit</span>(p);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">T <span class="title">qry</span><span class="params">(<span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        T res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (r != <span class="number">0</span>) &#123;</span><br><span class="line">            res += tree[r];</span><br><span class="line">            r -= <span class="built_in">lowbit</span>(r);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">T <span class="title">qry</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (l &gt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">qry</span>(r) - <span class="built_in">qry</span>(l - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">qry</span>(r);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">findleq</span><span class="params">(T v)</span><span class="type">const</span> <span class="comment">//前缀和小于等于的最大位置</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="type">int</span> p = <span class="number">0</span>;</span><br><span class="line">        T sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> len = upper; len != <span class="number">0</span>; len &gt;&gt;= <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (len + p &lt;= n &amp;&amp; sum + tree[len + p] &lt;= v) &#123;</span><br><span class="line">                p += len;</span><br><span class="line">                sum += tree[p];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">findl</span><span class="params">(T v)</span><span class="type">const</span> <span class="comment">//严格小的最大位置</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="type">int</span> r = upper;</span><br><span class="line">        <span class="type">int</span> p = <span class="number">0</span>;</span><br><span class="line">        T sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> len = upper; len != <span class="number">0</span>; len &gt;&gt;= <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (len + p &lt;= n &amp;&amp; sum + tree[len + p] &lt; v) &#123;</span><br><span class="line">                p += len;</span><br><span class="line">                sum += tree[p];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">clear</span><span class="params">()</span><span class="comment">//</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            tree[i] = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(n + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; a[i];</span><br><span class="line">    &#125;</span><br><span class="line">    ll ans = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">1</span>; k &lt;= <span class="number">10</span>; k++) &#123;</span><br><span class="line">        vector&lt;<span class="type">int</span>&gt;<span class="built_in">le</span>(n + <span class="number">1</span>), <span class="built_in">re</span>(n + <span class="number">1</span>);</span><br><span class="line">        vector&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;<span class="built_in">pr</span>(n + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (a[i] &lt;= k) &#123;</span><br><span class="line">                le[i]++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                le[i]--;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (a[i] &gt;= k) &#123;</span><br><span class="line">                re[i]++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                re[i]--;</span><br><span class="line">            &#125;</span><br><span class="line">            le[i] += le[i - <span class="number">1</span>];</span><br><span class="line">            re[i] += re[i - <span class="number">1</span>];</span><br><span class="line">            pr[i] = &#123; le[i],re[i] &#125;;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">sort</span>(pr.<span class="built_in">begin</span>(), pr.<span class="built_in">end</span>());</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++) &#123;<span class="comment">//往右平移一段，去掉负值</span></span><br><span class="line">            le[i] = pr[i].first + n + <span class="number">1</span>;</span><br><span class="line">            re[i] = pr[i].second + n + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        bit&lt;<span class="type">int</span>&gt;<span class="built_in">t</span>(<span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(<span class="number">2</span> * n + <span class="number">10</span>));</span><br><span class="line">        stack&lt;<span class="type">int</span>&gt;s;</span><br><span class="line">        <span class="type">int</span> p = le[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (le[i] &gt; p) &#123;</span><br><span class="line">                <span class="keyword">while</span> (!s.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">                    t.<span class="built_in">add</span>(s.<span class="built_in">top</span>(), <span class="number">1</span>);</span><br><span class="line">                    s.<span class="built_in">pop</span>();</span><br><span class="line">                &#125;</span><br><span class="line">                p = le[i];</span><br><span class="line">            &#125;</span><br><span class="line">            ans += t.<span class="built_in">qry</span>(re[i] - <span class="number">1</span>);</span><br><span class="line">            s.<span class="built_in">push</span>(re[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="方法二逆向统计">方法二：逆向统计</h4>
+<p>我们可以考虑统计非法区间的数量，再用所有区间数量减去非法的得到合法的区间数量。<br />
+考虑<strong>非法区间的性质：一定存在一个数<span
+class="math inline">\(x\)</span>,使得区间中小于等于<span
+class="math inline">\(x\)</span>的数和大于<span
+class="math inline">\(x\)</span>的数数量相等</strong>。<br />
+那么我们可以用正向一样的前缀和方法来计算。<br />
+枚举数<span class="math inline">\(x\)</span>，小于等于<span
+class="math inline">\(x\)</span>的赋值为-1，大于<span
+class="math inline">\(x\)</span>的赋值为1，设<span
+class="math inline">\(f\)</span>为前缀和数组。那么非法区间<span
+class="math inline">\([l,r]\)</span>有:<br />
+<span class="math display">\[f[r] = f[l - 1]\]</span><br />
+具体做法是开一个数组<span class="math inline">\(cnt\)</span>来统计<span
+class="math inline">\(f\)</span>的值为<span
+class="math inline">\(k\)</span>时,满足的数量。<br />
+然而，形如<span
+class="math inline">\([1,1,4,5,1,4]\)</span>的区间，在<span
+class="math inline">\(x =
+1,2,3\)</span>时都会计入一次非法区间，会导致重复计数。重复计数后好像没有什么办法通过容斥减去重复，那么有没有办法避免重复呢?<br />
+一些非法区间有很多个<span
+class="math inline">\(x\)</span>可以check到，但是<strong>这些<span
+class="math inline">\(x\)</span>中只有最小的那个会在这个区间中出现！</strong>(可以check到的一定是连续的一些，下界一定出现在非法区间中)<br />
+那么我们计数的时候，只在<span
+class="math inline">\(x\)</span>最小说计入数量，或者说只在<span
+class="math inline">\(x\)</span>出现在这个区间时，我们才计入这个非法区间的贡献。<br />
+那么我们怎么确保我们统计的区间里面有<span
+class="math inline">\(x\)</span>呢？回想我们前面的方法是对当前点<span
+class="math inline">\(r\)</span>,把<span
+class="math inline">\(cnt[f_r]\)</span>作为以<span
+class="math inline">\(r\)</span>为右端点的非法区间的数量。这里小于<span
+class="math inline">\(r\)</span>的点都已经计入了<span
+class="math inline">\(cnt\)</span>中。那么如果我们要求区间一定含有<span
+class="math inline">\(x\)</span>,那么在更改后的方法里，<span
+class="math inline">\(r\)</span>到已经加入<span
+class="math inline">\(cnt\)</span>的点之间必须有一个<span
+class="math inline">\(x\)</span>。<br />
+所以我们一个考虑一个点何时加入到<span
+class="math inline">\(cnt\)</span>中：从它本身开始(<strong>不包括本身</strong>)(因为作为左端点<span
+class="math inline">\(l\)</span>时，表示的区间是从<span
+class="math inline">\(l+1\)</span>开始的),直到遇到一个<span
+class="math inline">\(x\)</span>，我们再把他加入到<span
+class="math inline">\(cnt\)</span>中，那么对于所有的<span
+class="math inline">\(r\)</span>,我们在求解它时加入<span
+class="math inline">\(cnt\)</span>的点至少和<span
+class="math inline">\(r\)</span>之间有一个<span
+class="math inline">\(x\)</span>。<br />
+而对于每个点，如果是<span
+class="math inline">\(x\)</span>的话，我们应该先加入应该加入的点，再计算。<br />
+如果用数组统计的话，算法是线性的，时间复杂度为<span
+class="math inline">\(O(\Omega n)\)</span><br />
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ll n;</span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(n<span class="number">+1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        cin &gt;&gt; a[i];</span><br><span class="line">    &#125;</span><br><span class="line">    ll ans = n*(n<span class="number">+1</span>)/<span class="number">2</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">10</span>; i++) &#123;</span><br><span class="line">        vector&lt;<span class="type">int</span>&gt;<span class="built_in">ps</span>(n + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">1</span>; j &lt;= n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (a[j] &lt;= i) </span><br><span class="line">                ps[j]++;</span><br><span class="line">            <span class="keyword">else</span> </span><br><span class="line">                ps[j]--;</span><br><span class="line">            ps[j] += ps[j - <span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        map&lt;<span class="type">int</span>, ll&gt;mp;</span><br><span class="line">        stack&lt;<span class="type">int</span>&gt;buf;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt;= n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (a[j] == i) &#123;</span><br><span class="line">                <span class="keyword">while</span> (!buf.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">                    mp[buf.<span class="built_in">top</span>()]++;</span><br><span class="line">                    buf.<span class="built_in">pop</span>();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            ans -= mp[ps[j]];</span><br><span class="line">            buf.<span class="built_in">push</span>(ps[j]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="先鸽着">先鸽着</h2>
+]]></content>
+      <categories>
+        <category>题解</category>
+        <category>Codeforces</category>
+        <category>Contest</category>
+      </categories>
+  </entry>
 </search>
