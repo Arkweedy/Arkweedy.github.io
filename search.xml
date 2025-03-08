@@ -1213,4 +1213,220 @@ n)\)</span>。<br />
         <category>Contest</category>
       </categories>
   </entry>
+  <entry>
+    <title>Dsu on tree练习</title>
+    <url>/2025/03/01/%E7%AE%97%E6%B3%95/%E5%9B%BE%E8%AE%BA/2025Dsu_on_tree/</url>
+    <content><![CDATA[<h1 id="dsu-on-tree">DSU on tree</h1>
+<p>即树上启发式合并。<br />
+算法流程通常是通过dfs处理出树上每个点的重儿子，然后通过一个dfs算法来计算答案。对于一个节点，我们从重儿子继承信息，暴力合并轻儿子的信息，同时处理出每个点/点对/...对答案的贡献。<br />
+如果我们暴力合并轻儿子的时间复杂度和轻子树的大小成线性关系，那么由重链剖分的性质，一个点到根的路径最多有<span
+class="math inline">\(\log
+n\)</span>条轻边，那么每个点的贡献实际上是<span
+class="math inline">\(logn\)</span>级的，那么总的合并轻子复杂度为<span
+class="math inline">\(O(n\log
+n)\)</span>(实际上这个常数很小，因为每个点最多只有<span
+class="math inline">\(\log n\)</span>次贡献，很多点取不到这么大)<br />
+我们继承重子的操作数量级是<span
+class="math inline">\(O(n)\)</span>的，如果我们可以确保每次继承重子的复杂度在<span
+class="math inline">\(O(1)\)</span>或者<span
+class="math inline">\(O(\log
+n)\)</span>的话，那么启发式合并总的时间复杂度在<span
+class="math inline">\(O(n\log n)\)</span>。<br />
+启发式合并的空间复杂度取决于具体的实现方式，如果按照oi-wiki上的方法，两次遍历轻子的话，空间复杂度可以达到<span
+class="math inline">\(O(n)\)</span>,如果不做这样的操作(或者这样的操作不太好实现)的话，复杂度取决于记录贡献用的容器，如果是vector作为桶的话，可能会到<span
+class="math inline">\(O(n\log n)\)</span>,如果是map的话可能还<span
+class="math inline">\(O(n)\)</span>。</p>
+<p>下面是近期做的一些dsu on tree</p>
+<h1 id="t1-nc2025winter-round5-g">T1 <a
+href="https://ac.nowcoder.com/acm/contest/95337/G">NC2025winter Round5
+G</a></h1>
+<h3 id="题目大意">题目大意</h3>
+<p>一颗树，有点权<span class="math inline">\(w\)</span>，求三元组<span
+class="math inline">\((x,y,z)\)</span>数量，其中<span
+class="math inline">\(x &lt; y, w_x = w_y,w_x &lt; w_z\)</span>,且<span
+class="math inline">\(z\)</span>在<span
+class="math inline">\(x\)</span>到<span
+class="math inline">\(y\)</span>的路径上。</p>
+<h3 id="分析">分析</h3>
+<p>由于是求三元组，我们可以枚举节点<span
+class="math inline">\(z\)</span>(这个更特殊一些)，然后计算合法的<span
+class="math inline">\(x,y\)</span>对的数量。<br />
+如果是暴力枚举，我们需要以每个点为根搜一遍所有子树并且统计信息，时间复杂度为<span
+class="math inline">\(O(n^2)\)</span>。<br />
+我们考虑使用dsu on
+tree的思想得到一个较优的枚举方案，同时想出一个合适的计算贡献方案，可以利用继承重子的信息。这里我们可以随意指定一个根，下面所说子树均是以一个固定点为根的子树。<br />
+统计时，我们可以用一个(unordered_)map来统计一个节点子树内权值为<span
+class="math inline">\(w\)</span>的点出现了<span
+class="math inline">\(c_w\)</span>次。<br />
+对于一个点<span
+class="math inline">\(p\)</span>，我们把<strong>以该节点为<span
+class="math inline">\(z\)</span>的贡献</strong>分成两部分：<br />
+1. 子树内相互贡献(点<span
+class="math inline">\(p\)</span>不同子节点的子树相互贡献)<br />
+2. 子树内对子树外贡献</p>
+<p>这样就把这个节点的贡献不重不漏地分成两部分，且都可以根据我们维护的信息快速得出。</p>
+<h3 id="子树内相互贡献">1. 子树内相互贡献</h3>
+<p>对于第一部分，我们暴力合并轻子求解，算法流程如下：<br />
+1. <strong>枚举子树</strong><span
+class="math inline">\(map_s\)</span>内的信息<span
+class="math inline">\((w,c_w)\)</span>,如果<span class="math inline">\(w
+&lt; w_p\)</span>,将贡献<span class="math inline">\(c_w *
+map_p[c_w]\)</span>(这里应该先count)计入该点的贡献。<br />
+2. 并入子树<span class="math inline">\(map_s\)</span>内的信息。<br />
+3. 对下一轻子重复1，2.</p>
+<p>需要注意的是(<strong>注意节点<span
+class="math inline">\(p\)</span>的子树和它的子节点的子树的区别</strong>)<br />
+1.
+我们不能边计算贡献边把轻子信息并入这个点。因为这样可能导致计算同一子节点的子树内的点的相互贡献，而同一子节点的子树内的点的路径不经过<span
+class="math inline">\(p\)</span>。<br />
+2.
+我们不能先把贡献全算一遍，在来加一遍信息。这样会导致只计算了轻子树对重子树的贡献，轻子树之间的贡献没有计算。</p>
+<p>这两点对于理解子树内贡献的正确性是非常重要的。</p>
+<p>1，2两步的复杂度均为<span
+class="math inline">\(O(size_s)\)</span>(不考虑map的常数，实际上这里使用unorder_map完全没问题)。由重链剖分的复杂度分析，这部分的复杂度为<span
+class="math inline">\(O(n\log n)\)</span>。</p>
+<h3 id="子树内对子树外贡献">2.子树内对子树外贡献</h3>
+<p>在计算完第一部分的贡献后，我们合并了这个子树内的信息。于是可以尝试计算子树内对子树外的贡献。(不要推的时候把这部分贡献给搞漏了)<br />
+我们可以先预先统计整个树上<span
+class="math inline">\(w\)</span>权值的点数<span
+class="math inline">\(t_s\)</span>。那么知道了子树内权值为<span
+class="math inline">\(w\)</span>的点数<span
+class="math inline">\(c_w\)</span>，子树外权值为<span
+class="math inline">\(w\)</span>的点数就相当好得到，一个简单的容斥告诉我们为<span
+class="math inline">\(t_w - c_w\)</span>。<br />
+一个朴素的计算方法是，遍历这个点<span
+class="math inline">\(map\)</span>上的所有权值<span
+class="math inline">\((w,c_w)\)</span>,计算出贡献和<span
+class="math inline">\(\sum_w c_w * (t_w - c_w) * [w &lt;
+w_p]\)</span>。<br />
+显然，这个是<span
+class="math inline">\(O(size_p)\)</span>的，复杂度有问题。<br />
+我们要求的贡献是一个类似前缀和的东西(因为大于等于<span
+class="math inline">\(w_p\)</span>的都被舍去了),考虑尝试使用树状数组维护。<br />
+我们考虑拆解贡献的计算式：<br />
+<span class="math display">\[\sum_w c_w * (t_w - c_w) * [w &lt; w_p] =
+\sum_w c_w*t_w - \sum c_w^2\]</span><br />
+我们可以使用两个树状数组分别维护<span class="math inline">\(c_w*t_w
+、c_w^2\)</span>,求解一个点的贡献的复杂度就是求区间和，复杂度是<span
+class="math inline">\(O(\log n)\)</span>.那么第二部分的总复杂度为<span
+class="math inline">\(O(n \log n)\)</span><br />
+在维护树状数组对前面加入信息的影响。<br />
+并入信息的单点修改时间复杂度为<span class="math inline">\(O(\log
+n)\)</span>,每个点最多加入<span class="math inline">\(\log
+n\)</span>次那么这部分是时间复杂度为<span class="math inline">\(O(n \log
+^2 n)\)</span></p>
+<h3 id="总结">总结</h3>
+<p>我们通过分别计算子树内相互贡献、子树内对子树外贡献，总的时间复杂度为<span
+class="math inline">\(O(n \log ^2n)\)</span></p>
+<h1 id="t2-cf1681f">T2 <a
+href="https://codeforces.com/contest/1681/problem/F">CF1681F</a></h1>
+<p><del><em>dsu on tree
+好难想，做的时候凑贡献式子wa了一上午</em></del></p>
+<h3 id="题目大意-1">题目大意</h3>
+<p><span class="math inline">\(n\)</span>个点的树，有边权。<br />
+<span class="math inline">\(f(u,v) = u\)</span>到<span
+class="math inline">\(v\)</span>的路径上仅出现一次的边权数。<br />
+求<span class="math inline">\(\sum_u\sum_vf(u,v)\)</span></p>
+<h3 id="分析-1">分析</h3>
+<p>虽然虚树，线段树分治什么的都可以做而且思维难度我感觉远小于dsu on
+tree，但是拿来练一练<span class="math inline">\(dsu on
+tree\)</span>还是可以的。(<del>就是太折磨了</del>)<br />
+我们要维护的信息显然就是子树内的边权集(边权出现个数)，不过计算贡献成了难题。<br />
+由于我们要计算的是二元组<span
+class="math inline">\((u,v)\)</span>的个数所以我们不用像上题那样算什么子树内对外，这样一是会重复，而是计算合法的<span
+class="math inline">\((u,v)\)</span>个数需要一定的路径信息，这是没办法通过简单容斥得到的。<br />
+由于我们是启发式合并，在确定了根的情况下，每条边<span
+class="math inline">\(\{fa[u],u\}\)</span>都唯一依赖于远离根的点<span
+class="math inline">\(u\)</span>，所以我们可以把边权转移到点上。<br />
+先考虑合并过程中，子树内边权集的情况。<br />
+1. 继承重子<span class="math inline">\(hson\)</span>，加入点权<span
+class="math inline">\(val_{hson}\)</span>，计算贡献<br />
+2. 合并轻子<span class="math inline">\(s\)</span>,加入点权集<span
+class="math inline">\(valset_s\)</span>和<span
+class="math inline">\(val_s\)</span>，计算贡献<br />
+3. 递归</p>
+<p>我们可以发现合并儿子时还要单独加入儿子的权值，所以不如在递归前加入自身权值(即使自身的点权不属于自己的子树内的边权集，但是贡献计算完毕了)。</p>
+<p>仅维护边权集并不足以让我们有足够的信息计算出答案。我们需要维护新的信息，或者想想怎么计算贡献。</p>
+<p>我们考虑两种操作分别的影响：<br />
+1. 继承重子(多了一个新的边)<br />
+2. 合并轻子(多了一个新的子树)</p>
+<p>对于操作1，<span class="math inline">\(cover\)</span>的更新为<span
+class="math inline">\(cover[w_{h}] = size(p)\)</span></p>
+<p>先看操作1。<br />
+我们考虑新的点<span class="math inline">\(p\)</span>到重子<span
+class="math inline">\(h\)</span>内每个点的路径。重子点权为<span
+class="math inline">\(w\)</span><br />
+如果路径上没有相同边权，相对于原来从重子节点的路径，贡献多1。<br />
+反之如果有，<strong>贡献怎么变?</strong>。<br />
+仔细想想：如果路径上有1个相同边权，那么新路径和这条路径的贡献都变成0，相对于原贡献-1.这些点是什么呢？最浅层被<span
+class="math inline">\(w\)</span>的点夹着的点(包括上面那个)<br />
+如果路径上有2个以上的相同边权，这些贡献已经清零了，相对于原贡献不变。这些点是剩余那些。<br />
+我们用<span
+class="math inline">\(cover\)</span>(覆盖，很形象,可以是一个map)来记录在点权为<span
+class="math inline">\(w\)</span>的子树内的点。<br />
+用<span class="math inline">\(between\)</span>(中间，被<span
+class="math inline">\(w\)</span>的夹着的点)来记录最浅层被<span
+class="math inline">\(w\)</span>的点夹着的点(包括上面那个)的个数。<br />
+计从子树根出发的到子树内点的总贡献为<span
+class="math inline">\(val\)</span><br />
+贡献多-1的点数为<span
+class="math inline">\(between\)</span>，贡献多0的点数为<span
+class="math inline">\(cover[w] -
+between[w]\)</span>,贡献多1的点数为<span class="math inline">\(size -
+cover[w]\)</span><br />
+那么，继承重子的贡献为:<span class="math inline">\(val[h] + size[h] -
+cover[w] - between[w]\)</span><br />
+我们不如在递归下一层前，用上式更新自己的<span
+class="math inline">\(val\)</span>，所以新的<span
+class="math inline">\(val\)</span>定义为添加一个不冲突的点，应该加上的贡献。</p>
+<p>对于操作2，我们要求合并一个轻子<span
+class="math inline">\(s\)</span>多出来的贡献。<br />
+首先由于我们要确保时间复杂度正确，我们只能枚举轻子的信息。<br />
+考虑将新的路径拆成2部分，一部分是在重子(包括已经合并完了的轻子)的路径，一部分是轻子那边的路径。<br />
+对于重子那边的路径，相当于加了<span
+class="math inline">\(sz_s\)</span>个点(先不考虑边权问题)，贡献为<span
+class="math inline">\(val_p*size_s\)</span>,同理轻子那边的贡献为<span
+class="math inline">\(val_s*size_p\)</span>。<br />
+再考虑冲突问题，哪些点会产生冲突减少贡献呢？<br />
+考虑一个轻子里(对)<span
+class="math inline">\(between[w]\)</span>(有贡献)的点，路径上带有一个<span
+class="math inline">\(w\)</span>，如果在重子那边遇到一个<span
+class="math inline">\(cover[w]\)</span>的点，路径上就有2个<span
+class="math inline">\(w\)</span>，所以在减去轻子这边多算的贡献时应该减去<span
+class="math inline">\(\sum_w between_s[w] \times cover_p
+[w]\)</span>。<br />
+我们<strong>对偶地</strong>考虑，那么为了减去重子那边多算的贡献，我们减去<span
+class="math inline">\(\sum_w cover_s [w] \times
+between_p[w]\)</span><br />
+(我们<strong>只考虑边<span
+class="math inline">\(between\)</span>的点的损失</strong>，这样就不重不漏)</p>
+<p>最后我们考虑加点更新信息。<br />
+首先目前我们加点(实际上是加边)，首先是加入其他子树，最后才是加入自身。(想一想边集变化，上面也有解释)。<br />
+操作2的影响是很直接的，<span class="math inline">\(cover\)</span>和<span
+class="math inline">\(between\)</span>直接按点值加就行，没有相互作用。<br />
+操作完后加入自身，<span class="math inline">\(cover[w_p] = size[p],
+between[p] = cover[p] - precover[w_p]\)</span>，所以我们先修改<span
+class="math inline">\(between\)</span>,再修改<span
+class="math inline">\(cover\)</span>。</p>
+<p>再理一下算法流程：<br />
+1. 继承重子，加上贡献<span class="math inline">\(val[p]\)</span><br />
+2. 遍历轻子并且合并，加上贡献<br />
+3. 加入自身，修改自身的<span class="math inline">\(val 、cover
+、between\)</span></p>
+<p>考虑map的复杂度，时间复杂度为<span class="math inline">\(O(n \log^2
+n)\)</span>。<br />
+以下是我变量命名一塌糊涂的代码<br />
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> ll = <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> ull = <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> i64 = <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">using</span> edge = pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    vector&lt;vector&lt;edge&gt;&gt;<span class="built_in">g</span>(n + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        <span class="type">int</span> u, v, w;</span><br><span class="line">        cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;</span><br><span class="line">        g[u].<span class="built_in">emplace_back</span>(v, w);</span><br><span class="line">        g[v].<span class="built_in">emplace_back</span>(u, w);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">fa</span>(n + <span class="number">1</span>, <span class="number">-1</span>), <span class="built_in">hson</span>(n + <span class="number">1</span>, <span class="number">-1</span>), <span class="built_in">sz</span>(n + <span class="number">1</span>, <span class="number">1</span>), <span class="built_in">w</span>(n + <span class="number">1</span>);</span><br><span class="line">    function&lt;<span class="type">void</span>(<span class="type">int</span>)&gt;dfs = [&amp;](<span class="type">int</span> p)-&gt;<span class="type">void</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; [s, wi] : g[p]) &#123;</span><br><span class="line">                <span class="keyword">if</span> (s != fa[p]) &#123;</span><br><span class="line">                    fa[s] = p;</span><br><span class="line">                    w[s] = wi;</span><br><span class="line">                    <span class="built_in">dfs</span>(s);</span><br><span class="line">                    sz[p] += sz[s];</span><br><span class="line">                    <span class="keyword">if</span> (hson[p] == <span class="number">-1</span> || sz[hson[p]] &lt; sz[s]) &#123;</span><br><span class="line">                        hson[p] = s;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">cnt2</span>(n + <span class="number">1</span>);</span><br><span class="line">    vector&lt;ll&gt;<span class="built_in">val</span>(n + <span class="number">1</span>);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">newsz</span>(n + <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    ll ans = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> merge = [&amp;](<span class="type">int</span> fa, <span class="type">int</span> p)</span><br><span class="line">        &#123;</span><br><span class="line">            val[fa] += val[p];</span><br><span class="line">            newsz[fa] += newsz[p];</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//mp : \sum dep*cnt  cnt: 覆盖点数</span></span><br><span class="line">    function&lt;<span class="type">void</span>(<span class="type">int</span>, map&lt;<span class="type">int</span>, ll&gt;&amp; cnt, map&lt;<span class="type">int</span>, ll&gt;&amp; cnt2)&gt;dsu = [&amp;](<span class="type">int</span> p, map&lt;<span class="type">int</span>, ll&gt;&amp; cnt, map&lt;<span class="type">int</span>,ll&gt;&amp;cnt2 )-&gt;<span class="type">void</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (hson[p] != <span class="number">-1</span>) &#123;</span><br><span class="line">                <span class="built_in">dsu</span>(hson[p], cnt, cnt2);</span><br><span class="line">                <span class="comment">//合并hson</span></span><br><span class="line">                ans += val[hson[p]];</span><br><span class="line">                <span class="built_in">merge</span>(p, hson[p]);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; [s, w] : g[p]) &#123;</span><br><span class="line">                    map&lt;<span class="type">int</span>, ll&gt;tmp2,tmp3;</span><br><span class="line">                    <span class="keyword">if</span> (s != hson[p] &amp;&amp; s != fa[p]) &#123;</span><br><span class="line">                        <span class="built_in">dsu</span>(s,tmp2, tmp3);</span><br><span class="line">                        ans += val[p] * newsz[s] + val[s] * newsz[p];</span><br><span class="line"></span><br><span class="line">                        <span class="comment">//p to lson</span></span><br><span class="line">                        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; [v, c] : tmp3) &#123;</span><br><span class="line">                            ans -= c * cnt[v];</span><br><span class="line">                            <span class="comment">//mp[v] += c;</span></span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">//lson to p</span></span><br><span class="line">                        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; [v, c] : tmp2) &#123;</span><br><span class="line">                            ans -= c * cnt2[v];</span><br><span class="line">                            cnt[v] += c;</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; [v, c] : tmp3) &#123;</span><br><span class="line">                            <span class="comment">//ans -= c * mp[v];</span></span><br><span class="line">                            cnt2[v] += c;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="built_in">merge</span>(p, s);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//add p self</span></span><br><span class="line">            val[p] += sz[p];</span><br><span class="line">            val[p] -= cnt[w[p]] + cnt2[w[p]];</span><br><span class="line">            </span><br><span class="line">            cnt2[w[p]] = sz[p] - cnt[w[p]];</span><br><span class="line">            cnt[w[p]] = sz[p];</span><br><span class="line">            </span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    map&lt;<span class="type">int</span>, ll&gt;tmp,tmp2,tmp3;</span><br><span class="line">    <span class="function">mt19937 <span class="title">rng</span><span class="params">(chrono::steady_clock::now().time_since_epoch().count())</span></span>;</span><br><span class="line">    <span class="type">int</span> root = <span class="built_in">rng</span>() % n + <span class="number">1</span>;</span><br><span class="line">    <span class="comment">//root = 1;</span></span><br><span class="line">    <span class="built_in">dfs</span>(root);</span><br><span class="line">    <span class="built_in">dsu</span>(root,tmp2, tmp3);</span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br><span class="line">    std::cin.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">    </span><br><span class="line">   </span><br><span class="line">        <span class="built_in">solve</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> <del>这题用dsu on
+tree,做题感觉赤了一遍史，写题解又赤了一遍。</del></p>
+<h1 id="小结">小结</h1>
+<p>dsu on tree很好解决这种树上的点对、三元组的问题。<br />
+如果是点对的话，可以只考虑子树内合法的点对。<br />
+如果是三元组的话，可以考虑dfs到某个点时，以这个点作为三元组的一个，另外两个点在子树内/子树内加子树外的情况。这样就可以不重不漏了。</p>
+<p><em>ps : 以后要是遇到别的用dsu on tree的题，或许会更新</em></p>
+]]></content>
+      <categories>
+        <category>算法</category>
+        <category>图论</category>
+      </categories>
+  </entry>
 </search>
