@@ -2500,7 +2500,7 @@ class="math inline">\(C\)</span>,这使得我们无法对不同的<span
 class="math inline">\(C\)</span>预处理，必须想办法寻求别的方法求解。
 通过学习题解，这里又一个阴间小技巧，就是把<span
 class="math inline">\(d\)</span>拆成<span class="math inline">\(d =
-x\cdot \frac{x}{e}\)</span>,再继续化简成可以预处理方便求解的形式。</p>
+x\cdot \frac{x}{d}\)</span>,再继续化简成可以预处理方便求解的形式。</p>
 <h3 id="x部分"><span class="math inline">\(x\)</span>部分</h3>
 <p><span class="math display">\[\begin{align*}
     &amp; \prod_T^N (\prod_{d | T} x ^ {\mu(\frac{T}{d}) \times
