@@ -1,0 +1,429 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Xor on permutation | Arkweedy's Blog</title><meta name="author" content="Arkweedy"><meta name="copyright" content="Arkweedy"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="作用在排列上的异或运算 也不知道这一部分放在哪个类别下比较好,姑且放在数论下面了 前置知识 排列和置换 引入 偶尔在做算法题的时候会遇到需要研究一个区间的数都异或上一个数之后，这个区间的数的情况(这里情况指各种各样的性质)。不过我们可以把任意区间\([l,r]\)转化成两个排列\(P_{r},P_{l-1}\)的差。所以我们试图借助几个例题来研究排列异或一个数之后具有的性质。 以下是3">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Xor on permutation">
+<meta property="og:url" content="http://arkweedy.github.io/2025/03/20/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/Xor%20on%20permutation/index.html">
+<meta property="og:site_name" content="Arkweedy&#39;s Blog">
+<meta property="og:description" content="作用在排列上的异或运算 也不知道这一部分放在哪个类别下比较好,姑且放在数论下面了 前置知识 排列和置换 引入 偶尔在做算法题的时候会遇到需要研究一个区间的数都异或上一个数之后，这个区间的数的情况(这里情况指各种各样的性质)。不过我们可以把任意区间\([l,r]\)转化成两个排列\(P_{r},P_{l-1}\)的差。所以我们试图借助几个例题来研究排列异或一个数之后具有的性质。 以下是3">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://arkweedy.github.io/image/img024-you.png">
+<meta property="article:published_time" content="2025-03-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-16T06:44:05.586Z">
+<meta property="article:author" content="Arkweedy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://arkweedy.github.io/image/img024-you.png"><link rel="shortcut icon" href="/image/img000-you-logo.png"><link rel="canonical" href="http://arkweedy.github.io/2025/03/20/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/Xor%20on%20permutation/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Xor on permutation',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2026-02-16 14:44:05'
+}</script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+btf.addGlobalFn('pjaxSend', () => {
+  Pace.restart()
+}, 'pace_restart')
+
+</script><link rel="stylesheet" href="https://arkweedy.github.io/css_file/barber-shop.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="web_bg" style="background-image: url(https://arkweedy.github.io/image/img002-you.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/img001-you.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">21</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://arkweedy.github.io/image/img024-you.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="/image/img000-you-logo.png" alt="Logo"><span class="site-name">Arkweedy's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Xor on permutation</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Xor on permutation</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-03-19T16:00:00.000Z" title="发表于 2025-03-20 00:00:00">2025-03-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-16T06:44:05.586Z" title="更新于 2026-02-16 14:44:05">2026-02-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/">数论</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">3.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>18分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="作用在排列上的异或运算">作用在排列上的异或运算</h1>
+<p><em>也不知道这一部分放在哪个类别下比较好,姑且放在数论下面了</em></p>
+<h2 id="前置知识">前置知识</h2>
+<p>排列和置换</p>
+<h2 id="引入">引入</h2>
+<p>偶尔在做算法题的时候会遇到需要研究一个区间的数都异或上一个数之后，这个区间的数的情况(这里情况指各种各样的性质)。不过我们可以把任意区间<span
+class="math inline">\([l,r]\)</span>转化成两个排列<span
+class="math inline">\(P_{r},P_{l-1}\)</span>的差。所以我们试图借助几个例题来研究排列异或一个数之后具有的性质。
+以下是3个例题：<br />
+<a target="_blank" rel="noopener" href="https://codeforces.com/contest/1979/problem/B">CF1979B XOR
+Sequences</a><br />
+<a target="_blank" rel="noopener" href="https://codeforces.com/contest/2075/problem/E">CF2075E XOR
+Matrix</a><br />
+<a
+target="_blank" rel="noopener" href="https://codeforces.com/group/BJlsDCvlJO/contest/586547/problem/H">CF
+Group:0x3f vp Group FireflyCup H Simple XOR Problem</a></p>
+<h2 id="分析">分析</h2>
+<p>我们考虑一个无穷序列<span
+class="math inline">\(0,1,2,...\)</span>异或上一个数<span
+class="math inline">\(x\)</span>的情况。<br />
+显然，我们应该把<span
+class="math inline">\(x\)</span>拆成不同二进制位来分析，或者说异或<span
+class="math inline">\(x\)</span>的效果实际上是异或上<span
+class="math inline">\(x\)</span>不同二进制位的效果的叠加。<br />
+于是我们可以转而分析异或<span
+class="math inline">\(2\)</span>的自然数次幂的作用。<br />
+1. 如果<span class="math inline">\(xor 1\)</span>,序列变成<span
+class="math inline">\(1,0,3,2,5,4,...\)</span>,相当于把相邻两位做一个对换。<br />
+2. 如果<span class="math inline">\(xor 2\)</span>,序列变成<span
+class="math inline">\(2,3,0,1,6,7,4,5,...\)</span>相当于相邻2位一组，把相邻两组做一个对换。<br />
+3. 如果<span class="math inline">\(xor
+2^k\)</span>,可以类比推得：相当于每<span
+class="math inline">\(2^k\)</span>一组，顺次把每两组做一个对换。<br />
+可以发现，<span class="math inline">\(xor
+2^k\)</span>的影响区间是一段一段的(只有段内的对换，段之间没有对换)，每段之间没有干涉，段长是<span
+class="math inline">\(2^{k+1}\)</span>。我们可以先来看看段内之间的作用。<br />
+实际上段内的作用简单：<span class="math inline">\(xor
+k\)</span>的作用即为把一段的前半部分和后半部分对换，每半部分内部的顺序保持不变。<br />
+如果用置换的语言来描述的话，就是：<br />
+<span class="math display">\[Xor 2^k = \sum_{i = 0}^{\infty} \sigma_k(i)
+,\\ \sigma_k(i) = \begin{pmatrix}
+i \cdot 2^{k+1} + 0   &amp; i \cdot 2^{k+1} + 1     &amp; i \cdot
+2^{k+1} + 2     &amp; ... &amp; i \cdot 2^{k+1} + 2^k - 1 &amp; ...
+&amp; i \cdot 2^{k+1} + 2^{k+1} - 1\\
+i \cdot 2^{ k+1} + 2^k &amp; i \cdot 2^{k+1} + 2^k+1 &amp; i \cdot
+2^{k+1} +2^k +2 &amp;  ... &amp; i \cdot 2^{k+1} + 2^{k+1} - 1 &amp; ...
+&amp;i \cdot 2^{k+1} + 2^k - 1
+\end{pmatrix}\]</span><br />
+而且实际上这是一个自然数集上的<strong>双射</strong>。</p>
+<p>我们考虑其中一个平凡的置换在有限排列上的作用，即<br />
+<span class="math display">\[\sigma_k = \begin{pmatrix}
+0   &amp; 1     &amp; 2     &amp; ... &amp; 2^k - 1   &amp; 2^k &amp;
+... &amp; 2^{k+1} - 1\\
+2^k &amp; 2^k+1 &amp; +2^k +2 &amp;  ... &amp; 2^{k+1} - 1  &amp; 0
+&amp;...&amp; 2^k - 1
+\end{pmatrix}\]</span></p>
+<ol type="1">
+<li>如果排列长度<span class="math inline">\(n \geq
+2^{k+1}-1\)</span>,那么会对这个排列的前面这一段做一个对半的对换，作用后这一段在值域上仍保持连续。<br />
+</li>
+<li>如果排列长度<span class="math inline">\(n
+&lt;  2^{k+1}-1\)</span>,具体情况还可以再分类讨论：
+<ol type="1">
+<li>如果<span class="math inline">\(n \leq
+2^{k}-1\)</span>,那么这个排列将整体加上<span
+class="math inline">\(2^k\)</span>。<br />
+</li>
+<li>如果<span class="math inline">\(n \geq
+2^k\)</span>,那么这个排列被作用后，值域上变成不连续的两部分,其中一部分<span
+class="math inline">\(length \leq 2^{k}-1\)</span>,一部分<span
+class="math inline">\(n =  2^{k}-1\)</span>。</li>
+</ol></li>
+</ol>
+<p>根据我们前面的分析，我们可以得到一些推论，用于解决以上给出的3个例题。</p>
+<ol type="1">
+<li>对于一个区间<span
+class="math inline">\([l,r]\)</span>,它异或上一个数<span
+class="math inline">\(x\)</span>后，在值域上最多形成<span
+class="math inline">\(O(\log x)\)</span>个连续区间<br />
+&gt;<span class="math inline">\(Proof\)</span>：<br />
+我们从高位到低位去考虑异或一个数的影响。<br />
+根据我们前面所做的讨论，对于<span
+class="math inline">\(x\)</span>的最高位，一个连续区间最多只有左右两端的部分(块长不足<span
+class="math inline">\(2^{k+1}-1\)</span>,即情况2)会被"切割"开。<br />
+考虑其中被切割出来的一块(不妨设为右边那块)，它的左端点原来为<span
+class="math inline">\(i \cdot 2^{k+1}\)</span>,被置换到了<span
+class="math inline">\((i + 1) \cdot 2^{k + 1} -
+1\)</span>作为右端点。那么对于次高位，一定是不能从这一块的右端"切割"出一块的。<br />
+递归地考虑：除了最高位，每一位最多可以在上一位切割出来的新块上多切割出一块(因为被切出来的新块已经对齐一端了)。<br />
+那么实际上最多切割出<span class="math inline">\(2 \log
+x\)</span>块。而且平均值是小于<span class="math inline">\(\log
+x\)</span>的。<br />
+&gt; 这里有一个可以用来直观感受一下的代码：<br />
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> ll = <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> ull = <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> i64 = <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> uint = <span class="type">unsigned</span> <span class="type">int</span>;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">mt19937 <span class="title">g</span><span class="params">(chrono::steady_clock::now().time_since_epoch().count())</span></span>;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="type">int</span> inf = <span class="number">1</span>&lt;&lt;<span class="number">20</span>;</span><br><span class="line">    <span class="type">int</span> l = <span class="built_in">g</span>() % inf, r = <span class="built_in">g</span>() % inf;</span><br><span class="line">    <span class="keyword">if</span> (l &gt; r)<span class="built_in">swap</span>(l, r);</span><br><span class="line">    <span class="type">int</span> x = <span class="built_in">g</span>() % inf;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">a</span>(<span class="number">1</span> &lt;&lt; <span class="number">21</span> + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = l; i &lt;= r; i++) &#123;</span><br><span class="line">        a[i ^ x] = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//output</span></span><br><span class="line">    <span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">    vector&lt;pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&gt;ranges;</span><br><span class="line">    <span class="type">int</span> in = <span class="number">0</span>;</span><br><span class="line">    pair&lt;<span class="type">int</span>, <span class="type">int</span>&gt;pr;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; (<span class="number">1</span> &lt;&lt; <span class="number">21</span>) + <span class="number">1</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (a[i] == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (in) &#123;</span><br><span class="line">                in = <span class="literal">false</span>;</span><br><span class="line">                ranges.<span class="built_in">push_back</span>(pr);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (in)</span><br><span class="line">                pr.second = i;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                in = <span class="literal">true</span>;</span><br><span class="line">                pr.first = i;</span><br><span class="line">                pr.second = i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;l : &quot;</span> &lt;&lt; l &lt;&lt; <span class="string">&quot; r : &quot;</span> &lt;&lt; r &lt;&lt; <span class="string">&quot; x : &quot;</span> &lt;&lt; x &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ranges cnt : &quot;</span> &lt;&lt; ranges.<span class="built_in">size</span>() &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> [l, r] : ranges) &#123;</span><br><span class="line">        cout &lt;&lt; l &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; r &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br><span class="line">    std::cin.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">    <span class="type">int</span> tt;</span><br><span class="line">    cin &gt;&gt; tt;</span><br><span class="line">    <span class="keyword">while</span> (tt--)</span><br><span class="line">        <span class="built_in">solve</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>对于一个排列<span class="math inline">\(P_n\)</span>,记异或上<span
+class="math inline">\(x\)</span>之后,小于等于<span
+class="math inline">\(n\)</span>的数的个数为<span
+class="math inline">\(f_n(x)\)</span>。<br />
+有：
+<ol type="1">
+<li><span class="math inline">\(f_n(x) = f_n(y) \quad\quad   if \quad
+highbit(x) = highbit(y)\)</span></li>
+<li><span class="math inline">\(f_n(x) \leq f_n(y) \quad\quad if \quad
+highbit(x) &gt; highbit(y)\)</span> &gt;<span
+class="math inline">\(Proof\)</span>:<br />
+对第一条，<span class="math inline">\(x,y\)</span>最高位<span
+class="math inline">\(2^k\)</span>的影响是相同的。仅考虑最高位影响，显然只有最右端的置换<span
+class="math inline">\(\sigma_k(\left\lfloor\frac{n}{2^{k+1}}\right\rfloor)\)</span>会影响答案。<br />
+考虑前面我们讨论过的<span
+class="math inline">\(\sigma_k\)</span>作用在<span
+class="math inline">\(P_n\)</span>的情况(这里的<span
+class="math inline">\(n\)</span>和前面的不一样了)，如果是<span
+class="math inline">\(n &lt;2^k\)</span>，这一段被全部换到大于等于<span
+class="math inline">\(2^k\)</span>的位置，不管低位的置换作用是什么样子，这一段都会一直大于等于<span
+class="math inline">\(2^k\)</span>,贡献为0。<br />
+如果是<span class="math inline">\(n \leq 2^k\)</span>,会有<span
+class="math inline">\(n - 2^k + 1\)</span>个大于等于<span
+class="math inline">\(2^k\)</span>的数被换到左边。具有贡献，同时小于<span
+class="math inline">\(2^k\)</span>的数占满了大于等于<span
+class="math inline">\(2^k\)</span>的位置，其中<span
+class="math inline">\(n - 2^k +
+1\)</span>个位置有贡献。而无论低位的等效置换怎么换，产生的贡献是不变的。<br />
+所以<span class="math inline">\(f_n(x)\)</span>的值仅和<span
+class="math inline">\(x\)</span>的<span
+class="math inline">\(highbit\)</span>有关。<br />
+对于第二条，正向不太好说。但是我们可以逆向理解贡献的计算：<span
+class="math inline">\(n\)</span>减去被换到<span
+class="math inline">\(0\sim n\)</span>区域的大于<span
+class="math inline">\(n\)</span>的数。而我们可以观察到：高位越大，最右端的置换包含的超出<span
+class="math inline">\(n\)</span>的部分是不减的。可以比较直观地感受到第二条。(严谨一些的解释的话情况比较多，写起来有点麻烦(<del>好吧就是我懒了</del>))。<br />
+&gt; 下面来看看上面提到的3个题。</li>
+</ol></li>
+</ol>
+<h2 id="t1-cf1979b-xor-sequences">T1 <a
+target="_blank" rel="noopener" href="https://codeforces.com/contest/1979/problem/B">CF1979B XOR
+Sequences</a></h2>
+<p>一道简单的div2B 猜猜题。<br />
+题意大概是<span class="math inline">\(P_{\infty}\)</span>分别异或<span
+class="math inline">\(x,y\)</span>得到<span
+class="math inline">\(a,b\)</span>,求<span
+class="math inline">\(a,b\)</span>的最长公共子段(LCS)。<br />
+我们从置换叠加的角度去分析：<br />
+如果<span class="math inline">\(a\)</span>有<span
+class="math inline">\(\sigma_k\)</span>作用而<span
+class="math inline">\(b\)</span>没有，那么LCS最多长<span
+class="math inline">\(2^k\)</span>。<br />
+所以实际上我们是在找<span
+class="math inline">\(x,y\)</span>从低到高第一个不同的二进制位。<br />
+如果是第k位，那么答案为<span class="math inline">\(2^k\)</span>。</p>
+<h2 id="t2-cf2075e-xor-matrix">T2 <a
+target="_blank" rel="noopener" href="https://codeforces.com/contest/2075/problem/E">CF2075E XOR
+Matrix</a></h2>
+<p>div2E 思维题？<br />
+题意是在<span class="math inline">\(n\)</span>行<span
+class="math inline">\(m\)</span>列的矩阵的行和列上填上一些数，行，列的值域分别为<span
+class="math inline">\([0,x],[0,y]\)</span>。矩阵<span
+class="math inline">\(a_{ij}\)</span>的值为<span
+class="math inline">\(r_i \oplus
+c_j\)</span>。要求矩阵的值最多只有2种，问合法的填法数目。<br />
+首先，一行/列最多出现2种不同的值，因为异或是一个双射，3种不同值一定有3种结果，此时是不合法的。<br />
+于是我们可以分讨一下：<br />
+用<span class="math inline">\(a +
+b\)</span>表示我们行和列选几个不同的数。<br />
+1. <span class="math inline">\(1+1\)</span>,此时很简单，一共<span
+class="math inline">\((x+1)(y+1)\)</span>种填法。<br />
+2. <span class="math inline">\(1+2 /
+2+1\)</span>。任意选2个数填充行/列即可，这里需要考虑2种数的填法，减去退化成<span
+class="math inline">\(1+1\)</span>的情况。<br />
+一共<span class="math inline">\(\tbinom{x+1}{2}*(2^n - 2)*(y+1) +
+\tbinom{y+1}{2}*(2^m - 2)*(x+1)\)</span>种填法<br />
+3. <span
+class="math inline">\(2+2\)</span>此时比较复杂。我们先考虑什么时候是合法的：4个数的异或只有2种结果。实际上，我们可以选择行填充<span
+class="math inline">\(\{i,i\oplus k\}\)</span>,列填充<span
+class="math inline">\(\{j ,j \oplus k\}\)</span>,那么结果只有<span
+class="math inline">\(i\oplus j, i\oplus j\oplus
+k\)</span>两种，符合题意。其次我们考虑这形如这样的构造是否遍历到了所有的合法构造方法。实际上答案是肯定的。（这里可以仔细思考一下为什么）<br />
+不过这里我们<span
+class="math inline">\(k\)</span>从1开始取，不然就退化了。<br />
+然后就是对于每个<span class="math inline">\(k\)</span>，找出合法的<span
+class="math inline">\(i,j\)</span>的数目(为了避免重复，每对<span
+class="math inline">\(\{i,i \oplus k\}\)</span>只算一个)，即<span
+class="math inline">\(i &lt; i\oplus k\leq n\)</span>,<span
+class="math inline">\(j\)</span>类似。暴力肯定是不可取的。根据我们前面的推论，实际上每个对于<span
+class="math inline">\(highbit\)</span>相等的<span
+class="math inline">\(k\)</span>，这个值是相等的。于是我们可以枚举<span
+class="math inline">\(k = 2^r\)</span>的情况，每次一起计算<span
+class="math inline">\(highbit\)</span>相同的<span
+class="math inline">\(k\)</span>的答案即可。</p>
+<p>代码如下<br />
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> ll = <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> ull = <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> i64 = <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> uint = <span class="type">unsigned</span> <span class="type">int</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">int</span> mod = <span class="number">998244353</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> T <span class="title">power</span><span class="params">(T a, i64 b)</span> </span>&#123;</span><br><span class="line">    T res&#123; <span class="number">1</span> &#125;;</span><br><span class="line">    <span class="keyword">for</span> (; b; b /= <span class="number">2</span>, a *= a) &#123;</span><br><span class="line">        <span class="keyword">if</span> (b % <span class="number">2</span>) &#123;</span><br><span class="line">            res *= a;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> i64 <span class="title">mul</span><span class="params">(i64 a, i64 b, i64 p)</span> </span>&#123;</span><br><span class="line">    i64 res = a * b - <span class="built_in">i64</span>(<span class="number">1.L</span> * a * b / p) * p;</span><br><span class="line">    res %= p;</span><br><span class="line">    <span class="keyword">if</span> (res &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        res += p;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;i64 P&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">MInt</span> &#123;</span><br><span class="line">    i64 x;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="title">MInt</span><span class="params">()</span> : x&#123;</span> <span class="number">0</span> &#125; &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="title">MInt</span><span class="params">(i64 x)</span> : x&#123;</span> <span class="built_in">norm</span>(x % <span class="built_in">getMod</span>()) &#125; &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">static</span> i64 Mod;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="type">static</span> i64 <span class="title">getMod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (P &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> P;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Mod;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="type">static</span> <span class="type">void</span> <span class="title">setMod</span><span class="params">(i64 Mod_)</span> </span>&#123;</span><br><span class="line">        Mod = Mod_;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> i64 <span class="title">norm</span><span class="params">(i64 x)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (x &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            x += <span class="built_in">getMod</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (x &gt;= <span class="built_in">getMod</span>()) &#123;</span><br><span class="line">            x -= <span class="built_in">getMod</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> i64 <span class="title">val</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> MInt <span class="keyword">operator</span>-() <span class="type">const</span> &#123;</span><br><span class="line">        MInt res;</span><br><span class="line">        res.x = <span class="built_in">norm</span>(<span class="built_in">getMod</span>() - x);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> MInt <span class="title">inv</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">power</span>(*<span class="keyword">this</span>, <span class="built_in">getMod</span>() - <span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> MInt&amp; <span class="keyword">operator</span>*=(MInt rhs)&amp; &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">getMod</span>() &lt; (<span class="number">1ULL</span> &lt;&lt; <span class="number">31</span>)) &#123;</span><br><span class="line">            x = x * rhs.x % <span class="built_in">int</span>(<span class="built_in">getMod</span>());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            x = <span class="built_in">mul</span>(x, rhs.x, <span class="built_in">getMod</span>());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> MInt&amp; <span class="keyword">operator</span>+=(MInt rhs)&amp; &#123;</span><br><span class="line">        x = <span class="built_in">norm</span>(x + rhs.x);</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> MInt&amp; <span class="keyword">operator</span>-=(MInt rhs)&amp; &#123;</span><br><span class="line">        x = <span class="built_in">norm</span>(x - rhs.x);</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> MInt&amp; <span class="keyword">operator</span>/=(MInt rhs)&amp; &#123;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span> *= rhs.<span class="built_in">inv</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> MInt <span class="keyword">operator</span>*(MInt lhs, MInt rhs) &#123;</span><br><span class="line">        MInt res = lhs;</span><br><span class="line">        res *= rhs;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> MInt <span class="keyword">operator</span>+(MInt lhs, MInt rhs) &#123;</span><br><span class="line">        MInt res = lhs;</span><br><span class="line">        res += rhs;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> MInt <span class="keyword">operator</span>-(MInt lhs, MInt rhs) &#123;</span><br><span class="line">        MInt res = lhs;</span><br><span class="line">        res -= rhs;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> MInt <span class="keyword">operator</span>/(MInt lhs, MInt rhs) &#123;</span><br><span class="line">        MInt res = lhs;</span><br><span class="line">        res /= rhs;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> std::istream&amp; <span class="keyword">operator</span>&gt;&gt;(std::istream&amp; is, MInt&amp; a) &#123;</span><br><span class="line">        i64 v;</span><br><span class="line">        is &gt;&gt; v;</span><br><span class="line">        a = <span class="built_in">MInt</span>(v);</span><br><span class="line">        <span class="keyword">return</span> is;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> std::ostream&amp; <span class="keyword">operator</span>&lt;&lt;(std::ostream&amp; os, <span class="type">const</span> MInt&amp; a) &#123;</span><br><span class="line">        <span class="keyword">return</span> os &lt;&lt; a.<span class="built_in">val</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> <span class="type">bool</span> <span class="keyword">operator</span>==(MInt lhs, MInt rhs) &#123;</span><br><span class="line">        <span class="keyword">return</span> lhs.<span class="built_in">val</span>() == rhs.<span class="built_in">val</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> <span class="type">bool</span> <span class="keyword">operator</span>!=(MInt lhs, MInt rhs) &#123;</span><br><span class="line">        <span class="keyword">return</span> lhs.<span class="built_in">val</span>() != rhs.<span class="built_in">val</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">constexpr</span> <span class="type">bool</span> <span class="keyword">operator</span>&lt;(MInt lhs, MInt rhs) &#123;</span><br><span class="line">        <span class="keyword">return</span> lhs.<span class="built_in">val</span>() &lt; rhs.<span class="built_in">val</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line">i64 MInt&lt;<span class="number">0</span>&gt;::Mod = <span class="number">998244353</span>;</span><br><span class="line"><span class="comment">//i64 MInt&lt;0&gt;::Mod = 1000000007;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> Z = MInt&lt;<span class="number">0</span>&gt;;</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll a, <span class="type">int</span> p)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ll res = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (p != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (p &amp; <span class="number">1</span>)res = res * a % mod;</span><br><span class="line">        a = a * a % mod;</span><br><span class="line">        p &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> n, m;</span><br><span class="line">    cin &gt;&gt; n &gt;&gt; m;</span><br><span class="line">    <span class="type">int</span> x, y;</span><br><span class="line">    cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt;<span class="built_in">cntx</span>(<span class="number">30</span>), <span class="built_in">cnty</span>(<span class="number">30</span>);</span><br><span class="line">    Z ans = <span class="number">0</span>;</span><br><span class="line">    ll np = <span class="built_in">qpow</span>(<span class="number">2</span>, n), mp = <span class="built_in">qpow</span>(<span class="number">2</span>, m);</span><br><span class="line">    <span class="comment">//1+1</span></span><br><span class="line">    ans += <span class="built_in">Z</span>(<span class="number">1</span>) * (x + <span class="number">1</span>) * (y + <span class="number">1</span>);</span><br><span class="line">    <span class="comment">//1+2</span></span><br><span class="line">    ans += <span class="built_in">Z</span>(<span class="number">1</span>)*x * (x + <span class="number">1</span>) / <span class="number">2</span> * (np - <span class="number">2</span>) * (y + <span class="number">1</span>);</span><br><span class="line">    ans += <span class="built_in">Z</span>(<span class="number">1</span>)*y * (y + <span class="number">1</span>) / <span class="number">2</span> * (mp - <span class="number">2</span>) * (x + <span class="number">1</span>);</span><br><span class="line">    <span class="comment">//2+2</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">//(i,i^k)*(j,j^k)</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">30</span>; i++) &#123;</span><br><span class="line">        uint bitmask = ((<span class="number">1u</span> &lt;&lt; i + <span class="number">1</span>) - <span class="number">1</span>);</span><br><span class="line">        cntx[i] = (x &amp; ~bitmask) / <span class="number">2</span>;</span><br><span class="line">        cnty[i] = (y &amp; ~bitmask) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (x &gt;&gt; i &amp; <span class="number">1</span>)cntx[i] += (x &amp; bitmask &gt;&gt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (y &gt;&gt; i &amp; <span class="number">1</span>)cnty[i] += (y &amp; bitmask &gt;&gt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">30</span>; i++) &#123;<span class="comment">//comb * ok i * ok j * ok k</span></span><br><span class="line">        ans += <span class="built_in">Z</span>(<span class="number">1</span>)*(np - <span class="number">2</span>) * (mp - <span class="number">2</span>) * cntx[i]*cnty[i]*(<span class="number">1</span>&lt;&lt;i);</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; ans &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br><span class="line">    std::cin.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> tt;</span><br><span class="line">    cin &gt;&gt; tt;</span><br><span class="line">    <span class="keyword">while</span> (tt--)</span><br><span class="line">        <span class="built_in">solve</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="t3-cf-group0x3f-vp-group-fireflycup-h-simple-xor-problem">T3 <a
+target="_blank" rel="noopener" href="https://codeforces.com/group/BJlsDCvlJO/contest/586547/problem/H">CF
+Group:0x3f vp Group FireflyCup H Simple XOR Problem</a></h2>
+<p>打群友办的比赛碰到的题，也是让我想起来之前的一些想法，最终想出来异或将一个区间划分成<span
+class="math inline">\(\log\)</span>个区间的题。但是这题卡常，太坏了！<br />
+题意:求和<br />
+<span class="math display">\[
+\sum_{x=l}^{r}\left(x\oplus y\right)^k\pmod{(10^{9}+7)}
+\]</span> 其中<span class="math inline">\(l\)</span>, <span
+class="math inline">\(r\)</span>, <span
+class="math inline">\(y\)</span>, and <span
+class="math inline">\(k\)</span> (<span class="math inline">\(1\le l\le
+r\le 10^9\)</span>, <span class="math inline">\(1\le y\le 10^9\)</span>,
+<span class="math inline">\(1\le k\le 10^6\)</span>).<br />
+我们需要一些预备知识和技巧：<br />
+对于<span class="math inline">\([l,r]\)</span>上的求和，可以转化成<span
+class="math inline">\([0,r]\)</span>上的求和减去<span
+class="math inline">\([0,l-1]\)</span>上的求和。<br />
+自然数的<span class="math inline">\(k\)</span>次幂之和是一个<span
+class="math inline">\(k+1\)</span>次多项式，这个可以用lagrange插值法在最快<span
+class="math inline">\(O(n \log^2 n)\)</span>的复杂度下搞出来。<br />
+根据我们前面的推论，我们可以把异或后的值域划分成最多<span
+class="math inline">\(log
+y\)</span>个连续区间，每个连续区间的贡献我们用自然数<span
+class="math inline">\(k\)</span>次幂和公式求出来。形如<span
+class="math inline">\([l,r]\)</span>的区间在异或下的端点可能不太好维护，我们可以转成<span
+class="math inline">\([1,r]\)</span>这样的区间来解决，这样的区间是好维护的。<br />
+最后的复杂度：插值<span class="math inline">\(O(k \log^2 k)\)</span> +
+区间求和<span class="math inline">\(O(k\log y)\)</span>。<br />
+实现代码：<br />
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ll long long</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> mod = <span class="number">1e9</span> + <span class="number">7</span>, N = <span class="number">1e6</span> + <span class="number">10</span>;</span><br><span class="line">ll pre[N], suf[N], finv[N], fact[N], g[N];</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">qmi</span><span class="params">(ll a, ll k)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ll res = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (k)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (k &amp; <span class="number">1</span>)res = res * a % mod;</span><br><span class="line">        k &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">        a = a * a % mod;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    fact[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; N; ++i)</span><br><span class="line">        fact[i] = fact[i - <span class="number">1</span>] * i % mod;</span><br><span class="line">    finv[N - <span class="number">1</span>] = <span class="built_in">qmi</span>(fact[N - <span class="number">1</span>], mod - <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = N - <span class="number">1</span>; i &gt;= <span class="number">1</span>; --i)</span><br><span class="line">        finv[i - <span class="number">1</span>] = finv[i] * i % mod;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">cal</span><span class="params">(ll* f, <span class="type">int</span> mx, ll n)</span><span class="comment">//已知f[0]到f[mx] 求f[n]</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n &lt;= mx)<span class="keyword">return</span> f[n];</span><br><span class="line">    <span class="type">int</span> ans = <span class="number">0</span>;</span><br><span class="line">    pre[<span class="number">0</span>] = suf[mx] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= mx; ++i)</span><br><span class="line">        pre[i] = <span class="number">1ll</span> * (n - i + <span class="number">1</span>) % mod * pre[i - <span class="number">1</span>] % mod;<span class="comment">//注意到(n-i+1)*pre[i-1]在有些题可能爆ll 先%</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = mx; i &gt;= <span class="number">1</span>; --i)</span><br><span class="line">        suf[i - <span class="number">1</span>] = <span class="number">1ll</span> * (n - i) % mod * suf[i] % mod;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= mx; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> sg = (mx - i) &amp; <span class="number">1</span> ? <span class="number">-1</span> : <span class="number">1</span>;</span><br><span class="line">        ans = ans + <span class="number">1ll</span> * sg * pre[i] % mod * suf[i] % mod * finv[i] % mod * finv[mx - i] % mod * f[i] % mod;</span><br><span class="line">        <span class="keyword">if</span> (ans &gt;= mod)ans -= mod;</span><br><span class="line">        <span class="keyword">if</span> (ans &lt; <span class="number">0</span>)ans += mod;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> l, r, y, k;</span><br><span class="line"><span class="function">ll <span class="title">ask</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> r)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (l)<span class="keyword">return</span> (<span class="built_in">cal</span>(g, k + <span class="number">1</span>, r) - <span class="built_in">cal</span>(g, k + <span class="number">1</span>, l - <span class="number">1</span>)) % mod;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="built_in">cal</span>(g, k + <span class="number">1</span>, r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">query</span><span class="params">(<span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> l = <span class="number">0</span>;</span><br><span class="line">    ll res = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">30</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="type">int</span> a = x &gt;&gt; i &amp; <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> b = y &gt;&gt; i &amp; <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (a == <span class="number">0</span> &amp;&amp; b == <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (a == <span class="number">1</span> &amp;&amp; b == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="type">int</span> lq = l + (<span class="number">1</span> &lt;&lt; i);</span><br><span class="line">            <span class="type">int</span> rq = l + (<span class="number">1</span> &lt;&lt; (i + <span class="number">1</span>)) - <span class="number">1</span>;</span><br><span class="line">            res = (res + <span class="built_in">ask</span>(lq, rq)) % mod;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (a == <span class="number">0</span> &amp;&amp; b == <span class="number">1</span>)l += <span class="number">1</span> &lt;&lt; i;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (a == <span class="number">1</span> &amp;&amp; b == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="type">int</span> lq = l;</span><br><span class="line">            <span class="type">int</span> rq = l + (<span class="number">1</span> &lt;&lt; i) - <span class="number">1</span>;</span><br><span class="line">            res = (res + <span class="built_in">ask</span>(lq, rq)) % mod;</span><br><span class="line">            l += <span class="number">1</span> &lt;&lt; i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (res + <span class="built_in">ask</span>(l, l)) % mod;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">solve</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cin &gt;&gt; l &gt;&gt; r &gt;&gt; y &gt;&gt; k;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= k + <span class="number">1</span>; i++) &#123;</span><br><span class="line">        g[i] = (<span class="built_in">qmi</span>(i, k) + g[i - <span class="number">1</span>]) % mod;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ll res = (<span class="built_in">query</span>(r) - <span class="built_in">query</span>(l - <span class="number">1</span>)) % mod;</span><br><span class="line">    cout &lt;&lt; (res + mod) % mod &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">init</span>();</span><br><span class="line">    ios::<span class="built_in">sync_with_stdio</span>(<span class="number">0</span>), cin.<span class="built_in">tie</span>(<span class="number">0</span>), cout.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">    <span class="type">int</span> t = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (t--)<span class="built_in">solve</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://arkweedy.github.io">Arkweedy</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://arkweedy.github.io/2025/03/20/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/Xor%20on%20permutation/">http://arkweedy.github.io/2025/03/20/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/Xor%20on%20permutation/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://arkweedy.github.io" target="_blank">Arkweedy's Blog</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="https://arkweedy.github.io/image/img024-you.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/03/24/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/M%C3%B6bius%20inversion,%20M%C3%B6bius%20transformation%20and%20Inclusion-Exclusion%20on%20Posets/" title="Möbius inversion, Möbius transformation and Inclusion-Exclusion on Posets"><img class="cover" src="https://arkweedy.github.io/image/img025-chika.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Möbius inversion, Möbius transformation and Inclusion-Exclusion on Posets</div></div><div class="info-2"><div class="info-item-1">Möbius inversion, Möbius transformation and Inclusion-Exclusion on Posets pre 在算法竞赛中，Möbius反演主要出现在:一类推式子题用于数论分块优化/偏序集上的容斥/求解积性函数和Dirichlet卷积相关问题。而Möbius变换经常是解决位运算卷积之类的问题。 这篇blog主要用于梳理数论上这Möbius反演这及一些前置的知识，进一步的运用，以及Möbius变换的部分内涵，两种操作之间的联系。以及一些习题和其中的trick。 Part 1. Möbius inversion 前置知识 1. 积性函数 在数论中，算术函数（或称数论函数）指定义域为正整数、陪域为复数的函数，每个算术函数都可视为复数的序列。 这篇blog讨论的所有函数都是数论函数 积性函数： 如果一个函数\(f\)具有性质\(\forall( a,b,\gcd(a,b) = 1), f(ab)...</div></div></div></a><a class="pagination-related" href="/2025/03/01/%E7%AE%97%E6%B3%95/%E5%9B%BE%E8%AE%BA/2025Dsu_on_tree/" title="Dsu on tree练习"><img class="cover" src="https://arkweedy.github.io/image/img023-you.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Dsu on tree练习</div></div><div class="info-2"><div class="info-item-1">DSU on tree 即树上启发式合并。 算法流程通常是通过dfs处理出树上每个点的重儿子，然后通过一个dfs算法来计算答案。对于一个节点，我们从重儿子继承信息，暴力合并轻儿子的信息，同时处理出每个点/点对/...对答案的贡献。 如果我们暴力合并轻儿子的时间复杂度和轻子树的大小成线性关系，那么由重链剖分的性质，一个点到根的路径最多有\(\log n\)条轻边，那么每个点的贡献实际上是\(logn\)级的，那么总的合并轻子复杂度为\(O(n\log n)\)(实际上这个常数很小，因为每个点最多只有\(\log n\)次贡献，很多点取不到这么大) 我们继承重子的操作数量级是\(O(n)\)的，如果我们可以确保每次继承重子的复杂度在\(O(1)\)或者\(O(\log n)\)的话，那么启发式合并总的时间复杂度在\(O(n\log...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/img001-you.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Arkweedy</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">21</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Arkweedy"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8%E5%9C%A8%E6%8E%92%E5%88%97%E4%B8%8A%E7%9A%84%E5%BC%82%E6%88%96%E8%BF%90%E7%AE%97"><span class="toc-number">1.</span> <span class="toc-text">作用在排列上的异或运算</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86"><span class="toc-number">1.1.</span> <span class="toc-text">前置知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E5%85%A5"><span class="toc-number">1.2.</span> <span class="toc-text">引入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90"><span class="toc-number">1.3.</span> <span class="toc-text">分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#t1-cf1979b-xor-sequences"><span class="toc-number">1.4.</span> <span class="toc-text">T1 CF1979B XOR
+Sequences</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#t2-cf2075e-xor-matrix"><span class="toc-number">1.5.</span> <span class="toc-text">T2 CF2075E XOR
+Matrix</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#t3-cf-group0x3f-vp-group-fireflycup-h-simple-xor-problem"><span class="toc-number">1.6.</span> <span class="toc-text">T3 CF
+Group:0x3f vp Group FireflyCup H Simple XOR Problem</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/08/15/%E7%AE%97%E6%B3%95/String/SAM%20Problems/" title="一些后缀自动机问题"><img src="https://arkweedy.github.io/image/img028-yoshiko&amp;rikko.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="一些后缀自动机问题"/></a><div class="content"><a class="title" href="/2025/08/15/%E7%AE%97%E6%B3%95/String/SAM%20Problems/" title="一些后缀自动机问题">一些后缀自动机问题</a><time datetime="2025-08-14T16:00:00.000Z" title="发表于 2025-08-15 00:00:00">2025-08-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/06/07/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/exMusic/" title="幽灵乐团式子推导"><img src="https://arkweedy.github.io/image/img027-ayumu.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="幽灵乐团式子推导"/></a><div class="content"><a class="title" href="/2025/06/07/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/exMusic/" title="幽灵乐团式子推导">幽灵乐团式子推导</a><time datetime="2025-06-06T16:00:00.000Z" title="发表于 2025-06-07 00:00:00">2025-06-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/05/29/%E7%94%9F%E6%B4%BB/%E9%9A%8F%E7%AC%94/2023.5.29/" title="2023.5.29"><img src="https://arkweedy.github.io/image/img029-yoshiko.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2023.5.29"/></a><div class="content"><a class="title" href="/2025/05/29/%E7%94%9F%E6%B4%BB/%E9%9A%8F%E7%AC%94/2023.5.29/" title="2023.5.29">2023.5.29</a><time datetime="2025-05-28T16:00:00.000Z" title="发表于 2025-05-29 00:00:00">2025-05-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/01/%E9%A2%98%E8%A7%A3/Codeforces/ProblemSet/2025Mar/" title="CF 3月部分题题解"><img src="https://arkweedy.github.io/image/img026-chika.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CF 3月部分题题解"/></a><div class="content"><a class="title" href="/2025/04/01/%E9%A2%98%E8%A7%A3/Codeforces/ProblemSet/2025Mar/" title="CF 3月部分题题解">CF 3月部分题题解</a><time datetime="2025-03-31T16:00:00.000Z" title="发表于 2025-04-01 00:00:00">2025-04-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/24/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/M%C3%B6bius%20inversion,%20M%C3%B6bius%20transformation%20and%20Inclusion-Exclusion%20on%20Posets/" title="Möbius inversion, Möbius transformation and Inclusion-Exclusion on Posets"><img src="https://arkweedy.github.io/image/img025-chika.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Möbius inversion, Möbius transformation and Inclusion-Exclusion on Posets"/></a><div class="content"><a class="title" href="/2025/03/24/%E7%AE%97%E6%B3%95/%E6%95%B0%E8%AE%BA/M%C3%B6bius%20inversion,%20M%C3%B6bius%20transformation%20and%20Inclusion-Exclusion%20on%20Posets/" title="Möbius inversion, Möbius transformation and Inclusion-Exclusion on Posets">Möbius inversion, Möbius transformation and Inclusion-Exclusion on Posets</a><time datetime="2025-03-23T16:00:00.000Z" title="发表于 2025-03-24 00:00:00">2025-03-24</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By Arkweedy</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+      
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><div class="aplayer no-destroy" data-id="12242290047" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div><canvas class="fireworks" mobile="true"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
